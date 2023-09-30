@@ -69,7 +69,7 @@ Inputs
 - **Enable** - Enables output pins
 
 Outputs
-- **S1:S7** - Imidiate data latched.
+- **S1:S7** - Imediate data latched.
 - **Q1:Q7** - Latched data
 - **Q'1:Q'7** - Inverse of latched data (Not routed to output pins)
 
@@ -80,7 +80,22 @@ Available registers in this project.
 ![Available registers](/Images/InstructionRegister.png)
 - Program counter register (PC)
   - The program counter is a register that contains the address
-  of the instruction being executed at the current time. As each instruction gets fetched, the program counter increases its stored value by 1. After each instruction is fetched, the program counter points to the next instruction in the sequence.
+  of the instruction being executed at the current time. As each instruction gets fetched, the program counter increases its stored value by 1. After each instruction is fetched, the program counter points to the next instruction in the sequence. The program counter register is built using 8 J-K Flip Flops linked together.
+  https://www.daniellowengrub.com/blog/2021/02/08/binary-counter
+  ![8-Bit counter reference](/Images/8-BitCounter.gif)
+  
+  Inputs
+  - **Enable Out** - Enables the output pins
+  - **Enable** - Enables the counter
+  - **Reset** - Resets the counter back to 0
+  - **Write** - Write the input value A0:A8 to the current count value.
+  - **Clock** - Clock pulse
+  - **A1:A8** - Data input, used to set the current count value.
+  
+  Outputs
+  - **Q1:Q8** - Data output pins.
+  - **S1:S8** - Imediate data outputs.
+
 - Register A connected to the ALU
   - General purpose register connected directly to the ALU
 - Register B connected to the ALU
