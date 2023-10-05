@@ -49,9 +49,3 @@ void Clock::low()
     this->currentClockState = CLOCK_LOW;
     // remain low for pulse width
 }
-
-int main()
-{
-    Clock clock;
-    clock.step();
-}
