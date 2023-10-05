@@ -22,6 +22,7 @@ class LogicANDGate : public LogicGate
         ~LogicANDGate(void);
 
         bool process();
+        void update(bool A, bool B);
 };
 
 class LogicORGate : public LogicGate
@@ -31,6 +32,7 @@ class LogicORGate : public LogicGate
         ~LogicORGate(void);
 
         bool process();
+        void update(bool A, bool B);
 };
 
 class LogicXORGate : public LogicGate
@@ -40,6 +42,7 @@ class LogicXORGate : public LogicGate
         ~LogicXORGate(void);
 
         bool process();
+        void update(bool A, bool B);
 };
 
 class LogicNOTGate : public LogicGate
@@ -49,6 +52,7 @@ class LogicNOTGate : public LogicGate
         ~LogicNOTGate(void);
 
         bool process();
+        void update(bool A);
 };
 
 class LogicNANDGate : public LogicGate
@@ -58,6 +62,19 @@ class LogicNANDGate : public LogicGate
         ~LogicNANDGate(void);
 
         bool process();
+        void update(bool A, bool B);
+};
+
+class LogicNANDGate3 : public LogicGate
+{
+    public:
+        LogicNANDGate3(bool A, bool B, bool C);
+        ~LogicNANDGate3(void);
+
+        bool process();
+        void update(bool A, bool B, bool C);
+    protected:
+        bool _C;
 };
 
 class LogicNORGate : public LogicGate
@@ -77,5 +94,6 @@ class LogicXNORGate : public LogicGate
         ~LogicXNORGate(void);
 
         bool process();
+        void update(bool A, bool B);
 };
 #endif // __LogicGate_H__

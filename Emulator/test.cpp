@@ -4,11 +4,14 @@
 #include "FullAdder.h"
 #include "EightBitAdder.h"
 #include "DLatch.h"
+#include "DFlipFlop.h"
+
 #include <stdio.h>
 
-void testLogicAND()
+#include <gtest/gtest.h>
+
+TEST(testLogicAND, FullCircuit)
 {
-    printf("Testing Logical AND\n");
     bool testData[12] = {
         false, false, false,
         false, true, false,
@@ -19,21 +22,12 @@ void testLogicAND()
     for (int i = 0; i < 12; i+=3)
     {
         LogicANDGate gate(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
-        if (gate.process() == testData[i+2])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+2]);
     }
 }
 
-void testLogicOR()
+TEST(testLogicOR, FullCircuit)
 {
-    printf("Testing Logical OR\n");
     bool testData[12] = {
         false, false, false,
         false, true, true,
@@ -44,21 +38,12 @@ void testLogicOR()
     for (int i = 0; i < 12; i+=3)
     {
         LogicORGate gate(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
-        if (gate.process() == testData[i+2])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+2]);
     }
 }
 
-void testLogicXOR()
+TEST(testLogicXOR, FullCircuit)
 {
-    printf("Testing Logical XOR\n");
     bool testData[12] = {
         false, false, false,
         false, true, true,
@@ -69,21 +54,12 @@ void testLogicXOR()
     for (int i = 0; i < 12; i+=3)
     {
         LogicXORGate gate(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
-        if (gate.process() == testData[i+2])
-        {
-            printf("PASS [%d]\n", testData[i+2]);
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+2]);
     }
 }
 
-void testLogicNOT()
+TEST(testLogicNOT, FullCircuit)
 {
-    printf("Testing Logical NOT\n");
     bool testData[4] = {
         false, true,
         true, false
@@ -92,21 +68,12 @@ void testLogicNOT()
     for (int i = 0; i < 4; i+=2)
     {
         LogicNOTGate gate(testData[i]);
-        printf("A %d ", testData[i]);
-        if (gate.process() == testData[i+1])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+1]);
     }
 }
 
-void testLogicNAND()
+TEST(testLogicNAND, FullCircuit)
 {
-    printf("Testing Logical NAND\n");
     bool testData[12] = {
         false, false, true,
         false, true, true,
@@ -117,21 +84,12 @@ void testLogicNAND()
     for (int i = 0; i < 12; i+=3)
     {
         LogicNANDGate gate(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
-        if (gate.process() == testData[i+2])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+2]);
     }
 }
 
-void testLogicNOR()
+TEST(testLogicNOR, FullCircuit)
 {
-    printf("Testing Logical NOR\n");
     bool testData[12] = {
         false, false, true,
         false, true, false,
@@ -142,21 +100,12 @@ void testLogicNOR()
     for (int i = 0; i < 12; i+=3)
     {
         LogicNORGate gate(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
-        if (gate.process() == testData[i+2])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+2]);
     }
 }
 
-void testLogicXNOR()
+TEST(testLogicXNOR, FullCircuit)
 {
-    printf("Testing Logical XNOR\n");
     bool testData[12] = {
         false, false, true,
         false, true, false,
@@ -167,22 +116,12 @@ void testLogicXNOR()
     for (int i = 0; i < 12; i+=3)
     {
         LogicXNORGate gate(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
-        if (gate.process() == testData[i+2])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL actual: %d\n", gate.process());
-        }
+        ASSERT_EQ(gate.process(), testData[i+2]);
     }
 }
 
-void testHalfAdder(void)
+TEST(testHalfAdder, FullCircuit)
 {
-    printf("Testing Half Adder\n");
-
     bool testData[] = {
         //A    B      Sum    Carry
         false, false, false, false,
@@ -194,28 +133,14 @@ void testHalfAdder(void)
     for (int i = 0; i < 16; i+=4)
     {
         HalfAdder ha(testData[i], testData[i+1]);
-        printf("A %d B %d ", testData[i], testData[i+1]);
         ha.process();
-        if ((ha.sum() == testData[i+2]) &&
-            (ha.carry() == testData[i+3]))
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL expected Sum[%d] Carry[%d] actual Sum[%d] Carry[%d]\n",
-            testData[i+2],
-            testData[i+3],
-            ha.sum(),
-            ha.carry());
-        }
+        ASSERT_EQ(ha.sum(), testData[i+2]);
+        ASSERT_EQ(ha.carry(), testData[i+3]);
     }
 }
 
-void testFullAdder(void)
+TEST(testFullAdder, FullCircuit)
 {
-    printf("Testing Full Adder\n");
-
     bool testData[] = {
         //A    B      Ci     Sum    Carry
         false, false, false, false, false,
@@ -231,27 +156,14 @@ void testFullAdder(void)
     for (int i = 0; i < 40; i+=5)
     {
         FullAdder fa(testData[i], testData[i+1], testData[i+2]);
-        printf("A %d B %d Ci: %d ", testData[i], testData[i+1], testData[i+2]);
         fa.process();
-        if ((fa.sum() == testData[i+3]) &&
-            (fa.carry() == testData[i+4]))
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL expected Sum[%d] Carry[%d] actual Sum[%d] Carry[%d]\n",
-            testData[i+3],
-            testData[i+4],
-            fa.sum(),
-            fa.carry());
-        }
+        ASSERT_EQ(fa.sum(), testData[i+3]);
+        ASSERT_EQ(fa.carry(), testData[i+4]);
     }
 }
 
-void testEightBitAdder()
+TEST(testEightBitAdder, FullCircuit)
 {
-    printf("Testing Eight Bit Adder\n");
     for (int i = 0; i < 255; i++)
     {
         for (int j = 0; j < 255; j++)
@@ -260,70 +172,47 @@ void testEightBitAdder()
             EightBitData B; B.set(j);
             EightBitAdder eba(A, B, 0);
             eba.process();
-            if (eba.sum().data.byte == (A.data.byte + B.data.byte) || 
-               (((A.data.byte + B.data.byte) > 0xFF) && eba.carry()))
-            {
-            }
-            else
-            {
-                printf("Inputs: A %d B %d Ci %d\n", A.data.byte, B.data.byte, 0);
-                printf("FAIL expected S %d C %d V %d actual S %d C %d V %d\n",
-                A.data.byte + B.data.byte,
-                0,
-                0,
-                eba.sum(),
-                eba.carry(),
-                eba.overflow());
-            }
+            ASSERT_TRUE( ((eba.sum().data.byte == (A.data.byte + B.data.byte)) || (((A.data.byte + B.data.byte) > 0xFF) && eba.carry())) );
         }
     }
 }
 
-void testDLatch(void)
+TEST(DLatchTest, FullCircuit)
 {
-    bool testData[] = {
-        // enable A Q ~Q
-        false, false, false, true,
-        false, true, false, true,
-        true, false, false, true,
-        true, true, true, false,
-        false, false, true, false
-    };
     DLatch dlatch(false, false);
-    dlatch.process();
 
-    for (int i = 0; i < 20; i+=4)
-    {
-        dlatch.update(testData[i], testData[i+1]);
-        dlatch.process();
-        printf("enable: %d A: %d ", testData[i], testData[i+1]);
-        if (dlatch.Q() == testData[i+2] && dlatch.QB() == testData[i+3])
-        {
-            printf("PASS\n");
-        }
-        else
-        {
-            printf("FAIL expected: Q: %d QB: %d actual Q: %d QB: %d \n", testData[i+2], testData[i+3], dlatch.Q(), dlatch.QB());
-        }
-    }
+    dlatch.process();
+    ASSERT_EQ(false, dlatch.Q());
+    ASSERT_EQ(true, dlatch.QB());
+
+    dlatch.update(false, true);
+    dlatch.process();
+    ASSERT_EQ(false, dlatch.Q());
+    ASSERT_EQ(true, dlatch.QB());
+
+    dlatch.update(true, false);
+    dlatch.process();
+    ASSERT_EQ(false, dlatch.Q());
+    ASSERT_EQ(true, dlatch.QB());
+
+    dlatch.update(true, true);
+    dlatch.process();
+    ASSERT_EQ(true, dlatch.Q());
+    ASSERT_EQ(false, dlatch.QB());
+
+    dlatch.update(false, false);
+    dlatch.process();
+    ASSERT_EQ(true, dlatch.Q());
+    ASSERT_EQ(false, dlatch.QB());
 }
 
-int main()
+TEST(DFlipFlopTest, FullCircuit)
 {
-    Clock clock;
-    clock.step();
+    DFlipFlop flipflop(false, false, true, false);
+    flipflop.process();
+}
 
-    testLogicAND();
-    testLogicOR();
-    testLogicXOR();
-    testLogicNOT();
-    testLogicNAND();
-    testLogicNOR();
-    testLogicXNOR();
-
-    testHalfAdder();
-    testFullAdder();
-    testEightBitAdder();
-
-    testDLatch();
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

@@ -17,20 +17,21 @@ void DLatch::update(bool enable, bool A)
 bool DLatch::process()
 {
     LogicNOTGate NOT(_A);
-    printf("NOT A = %d\n", NOT.process());
     LogicANDGate AND1(NOT.process(), _enable);
     LogicANDGate AND2(_A, _enable);
-    printf("AND1 = %d\n", AND1.process());
-    printf("AND2 = %d\n", AND2.process());
-    printf("Q = %d\n", _Q);
-    printf("QB = %d\n", _QB);
-    LogicNORGate NOR1(AND1.process(), !_QB);
-    LogicNORGate NOR2(AND2.process(), !_Q);
-    // try while loop, holding 1 active for few iterations
-    _Q = NOR1.process();
-    _QB = NOR2.process();
+    LogicNORGate NOR1(AND1.process(), _QB);
+    LogicNORGate NOR2(AND2.process(), _Q);
 
-    printf("Q = %d\n", _Q);
-    printf("QB = %d\n", _QB);
+    // Only process second set of gates if the enable is set.
+    if (_enable == true)
+    {
+        _Q = NOR1.process();
+        _QB = NOR2.process();
+        // Run the NOR process twice to simulate a clock high signal.  This is to avoid the race condition of Q and ~Q
+        NOR1.update(AND1.process(), _QB);
+        NOR2.update(AND2.process(), _Q);
+        _Q = NOR1.process();
+        _QB = NOR2.process();
+    }
     return true;
 }
