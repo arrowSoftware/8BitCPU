@@ -208,8 +208,34 @@ TEST(DLatchTest, FullCircuit)
 
 TEST(DFlipFlopTest, FullCircuit)
 {
-    DFlipFlop flipflop(false, false, true, false);
-    flipflop.process();
+    bool testData[] = {
+        // enable  A   S     R      Q      ~Q
+        false, false, false, false, false, true,
+        false, false, false, true, false, true,
+        false, false, true, false, true, false, 
+        false, false, true, true, true, true, // bad case
+        false, true, false, false, true, true, // no change
+        false, true, false, true, false, true,
+        false, true, true, false, true, false,
+        false, true, true, true, true, true, // bad case
+        true, false, false, false, false, true,
+        true, false, false, true, false, true,
+        true, false, true, false, true, false, 
+        true, false, true, true, true, true, // bad case
+        true, true, false, false, true, false,
+        true, true, false, true, false, true, 
+        true, true, true, false, true, false, 
+        true, true, true, true, true, true
+    };
+    DFlipFlop flipflop(false, false, false, false);
+    for (int i = 0; i < 96; i+=6)
+    {
+        flipflop.update(testData[i], testData[i+1], testData[i+2], testData[i+3]);
+        flipflop.process();
+        printf("e: %d A: %d S: %d R: %d Q: %d Q: %d\n", testData[i], testData[i+1], testData[i+2], testData[i+3], testData[i+4], testData[i+5]);
+        ASSERT_EQ(testData[i+4], flipflop.Q());
+        ASSERT_EQ(testData[i+5], flipflop.QB());
+    }
 }
 
 int main(int argc, char **argv) {

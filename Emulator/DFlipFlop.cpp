@@ -39,7 +39,9 @@ bool DFlipFlop::process()
     NAND5.process();
     NAND6.update(NOT2.process(), NAND3.process(), NAND5.process());
     NAND6.process();
-    printf("5:%d 6:%d\n", NAND5.process(), NAND6.process());
+    _Q = NAND5.process();
+    _QB = NAND6.process();
+    printf("5:%d 6:%d\n", _Q, _QB);
 
     return true;
 }
