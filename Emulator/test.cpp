@@ -2,6 +2,8 @@
 #include "LogicGate.h"
 #include "HalfAdder.h"
 #include "FullAdder.h"
+#include "EightBitAdder.h"
+#include "DLatch.h"
 #include <stdio.h>
 
 void testLogicAND()
@@ -16,7 +18,7 @@ void testLogicAND()
 
     for (int i = 0; i < 12; i+=3)
     {
-        LogicANDGate gate = LogicANDGate(testData[i], testData[i+1]);
+        LogicANDGate gate(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         if (gate.process() == testData[i+2])
         {
@@ -41,7 +43,7 @@ void testLogicOR()
 
     for (int i = 0; i < 12; i+=3)
     {
-        LogicORGate gate = LogicORGate(testData[i], testData[i+1]);
+        LogicORGate gate(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         if (gate.process() == testData[i+2])
         {
@@ -66,7 +68,7 @@ void testLogicXOR()
 
     for (int i = 0; i < 12; i+=3)
     {
-        LogicXORGate gate = LogicXORGate(testData[i], testData[i+1]);
+        LogicXORGate gate(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         if (gate.process() == testData[i+2])
         {
@@ -89,7 +91,7 @@ void testLogicNOT()
 
     for (int i = 0; i < 4; i+=2)
     {
-        LogicNOTGate gate = LogicNOTGate(testData[i]);
+        LogicNOTGate gate(testData[i]);
         printf("A %d ", testData[i]);
         if (gate.process() == testData[i+1])
         {
@@ -114,7 +116,7 @@ void testLogicNAND()
 
     for (int i = 0; i < 12; i+=3)
     {
-        LogicNANDGate gate = LogicNANDGate(testData[i], testData[i+1]);
+        LogicNANDGate gate(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         if (gate.process() == testData[i+2])
         {
@@ -139,7 +141,7 @@ void testLogicNOR()
 
     for (int i = 0; i < 12; i+=3)
     {
-        LogicNORGate gate = LogicNORGate(testData[i], testData[i+1]);
+        LogicNORGate gate(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         if (gate.process() == testData[i+2])
         {
@@ -164,7 +166,7 @@ void testLogicXNOR()
 
     for (int i = 0; i < 12; i+=3)
     {
-        LogicXNORGate gate = LogicXNORGate(testData[i], testData[i+1]);
+        LogicXNORGate gate(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         if (gate.process() == testData[i+2])
         {
@@ -191,7 +193,7 @@ void testHalfAdder(void)
 
     for (int i = 0; i < 16; i+=4)
     {
-        HalfAdder ha = HalfAdder(testData[i], testData[i+1]);
+        HalfAdder ha(testData[i], testData[i+1]);
         printf("A %d B %d ", testData[i], testData[i+1]);
         ha.process();
         if ((ha.sum() == testData[i+2]) &&
@@ -228,7 +230,7 @@ void testFullAdder(void)
 
     for (int i = 0; i < 40; i+=5)
     {
-        FullAdder fa = FullAdder(testData[i], testData[i+1], testData[i+2]);
+        FullAdder fa(testData[i], testData[i+1], testData[i+2]);
         printf("A %d B %d Ci: %d ", testData[i], testData[i+1], testData[i+2]);
         fa.process();
         if ((fa.sum() == testData[i+3]) &&
@@ -243,6 +245,65 @@ void testFullAdder(void)
             testData[i+4],
             fa.sum(),
             fa.carry());
+        }
+    }
+}
+
+void testEightBitAdder()
+{
+    printf("Testing Eight Bit Adder\n");
+    for (int i = 0; i < 255; i++)
+    {
+        for (int j = 0; j < 255; j++)
+        {
+            EightBitData A; A.set(i);
+            EightBitData B; B.set(j);
+            EightBitAdder eba(A, B, 0);
+            eba.process();
+            if (eba.sum().data.byte == (A.data.byte + B.data.byte) || 
+               (((A.data.byte + B.data.byte) > 0xFF) && eba.carry()))
+            {
+            }
+            else
+            {
+                printf("Inputs: A %d B %d Ci %d\n", A.data.byte, B.data.byte, 0);
+                printf("FAIL expected S %d C %d V %d actual S %d C %d V %d\n",
+                A.data.byte + B.data.byte,
+                0,
+                0,
+                eba.sum(),
+                eba.carry(),
+                eba.overflow());
+            }
+        }
+    }
+}
+
+void testDLatch(void)
+{
+    bool testData[] = {
+        // enable A Q ~Q
+        false, false, false, true,
+        false, true, false, true,
+        true, false, false, true,
+        true, true, true, false,
+        false, false, true, false
+    };
+    DLatch dlatch(false, false);
+    dlatch.process();
+
+    for (int i = 0; i < 20; i+=4)
+    {
+        dlatch.update(testData[i], testData[i+1]);
+        dlatch.process();
+        printf("enable: %d A: %d ", testData[i], testData[i+1]);
+        if (dlatch.Q() == testData[i+2] && dlatch.QB() == testData[i+3])
+        {
+            printf("PASS\n");
+        }
+        else
+        {
+            printf("FAIL expected: Q: %d QB: %d actual Q: %d QB: %d \n", testData[i+2], testData[i+3], dlatch.Q(), dlatch.QB());
         }
     }
 }
@@ -262,4 +323,7 @@ int main()
 
     testHalfAdder();
     testFullAdder();
+    testEightBitAdder();
+
+    testDLatch();
 }

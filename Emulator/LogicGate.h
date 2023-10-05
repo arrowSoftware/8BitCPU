@@ -67,6 +67,7 @@ class LogicNORGate : public LogicGate
         ~LogicNORGate(void);
 
         bool process();
+        void update(bool A, bool B);
 };
 
 class LogicXNORGate : public LogicGate

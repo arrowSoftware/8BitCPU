@@ -87,6 +87,12 @@ LogicNORGate::LogicNORGate(bool A, bool B) : LogicGate(A, B)
 LogicNORGate::~LogicNORGate(void)
 {}
 
+void LogicNORGate::update(bool A, bool B)
+{
+    _A = A;
+    _B = B;
+}
+
 bool LogicNORGate::process()
 {
     _Q = !(_A | _B);
