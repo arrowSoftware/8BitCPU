@@ -209,33 +209,31 @@ TEST(DLatchTest, FullCircuit)
 TEST(DFlipFlopTest, FullCircuit)
 {
     bool testData[] = {
-        // enable  A   S     R      Q      ~Q
-        false, false, false, false, false, true,
-        false, false, false, true, false, true,
-        false, false, true, false, true, false, 
-        false, false, true, true, true, true, // bad case
-        false, true, false, false, true, true, // no change
-        false, true, false, true, false, true,
-        false, true, true, false, true, false,
-        false, true, true, true, true, true, // bad case
-        true, false, false, false, false, true,
-        true, false, false, true, false, true,
-        true, false, true, false, true, false, 
-        true, false, true, true, true, true, // bad case
-        true, true, false, false, true, false,
-        true, true, false, true, false, true, 
-        true, true, true, false, true, false, 
-        true, true, true, true, true, true
+        //      enable   A      S     R      Q      ~Q
+        false, true,     false, true, true, false, true, // clock up and data 0
+        false, true,     true,  true, true, true, false, // clock up and data 1
+
+        false, false,    false,  false, true, true, false, // set = false
+        false, true,     false,  true, false, false, true, // reset = false
+        false, true,     false,  false, false, true, true, // clear and reset = false
+
+        true, false,    false,  true, true, true, false, // clock low and data = 0 (maintain current state)
+        true, false,    true,   true, true, true, false // clock low and data = 1 (maintain current state)
     };
+
     DFlipFlop flipflop(false, false, false, false);
-    for (int i = 0; i < 96; i+=6)
+    for (int i = 0; i < 49; i+=7)
     {
-        flipflop.update(testData[i], testData[i+1], testData[i+2], testData[i+3]);
+        flipflop.update(testData[i], testData[i+2], false, false);
         flipflop.process();
-        printf("e: %d A: %d S: %d R: %d Q: %d Q: %d\n", testData[i], testData[i+1], testData[i+2], testData[i+3], testData[i+4], testData[i+5]);
-        ASSERT_EQ(testData[i+4], flipflop.Q());
-        ASSERT_EQ(testData[i+5], flipflop.QB());
+
+        flipflop.update(testData[i+1], testData[i+2], testData[i+3], testData[i+4]);
+        flipflop.process();
+
+        ASSERT_EQ(testData[i+6], flipflop.Q());
+        ASSERT_EQ(testData[i+6], flipflop.QB());
     }
+
 }
 
 int main(int argc, char **argv) {

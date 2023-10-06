@@ -15,12 +15,14 @@ class DFlipFlop : public Circuit
         void update(bool enable, bool A, bool S, bool R);
         bool process(void);
     private:
-        bool _enable;
+        bool _enable; // Edge triggered pulse
         bool _A;
         bool _S;
         bool _R;
         bool _Q;
         bool _QB;
+        bool _lastEnable;
+        bool _lastA;
 };
 
 #endif // __DFlipFlop_H__
