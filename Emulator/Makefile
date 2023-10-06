@@ -10,19 +10,21 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = C:/Users/tyler/OneDrive/Documents/googletest/googletest
+#GTEST_DIR = C:/Users/tyler/OneDrive/Documents/googletest/googletest
+GTEST_DIR = /usr/src/gtest
 
 # Where to find user code.
 USER_DIR = .
 
-USER_SRCS  = test.cpp \
-			 Clock.cpp  \
-			 DLatch.cpp \
-			 DFlipFlop.cpp \
-			 EightBitAdder.cpp \
-			 FullAdder.cpp \
-			 HalfAdder.cpp \
-			 LogicGate.cpp \
+USER_SRCS  = Test.cpp \
+			 ALU.cpp  \
+			 CounterRegister.hpp \
+			 InstructionDecoder.cpp \
+			 ProgramLoader.cpp \
+			 ProgramROM.cpp \
+			 RAM.cpp \
+			 Register.hpp \
+			 DataBus.hpp
 
 USER_HEADS = $(USER_DIR)/*.h
 USER_OBJS = $(USER_SRCS:.cpp=.o)
