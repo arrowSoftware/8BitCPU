@@ -208,32 +208,35 @@ TEST(DLatchTest, FullCircuit)
 
 TEST(DFlipFlopTest, FullCircuit)
 {
+    // https://github.com/GIBIS-UNIFESP/wiRedPanda/blob/351d47990e14f8e105cac3a0e5481c1840cfcaaa/test/testlogicelements.cpp#L159
     bool testData[] = {
-        //      enable   A      S     R      Q      ~Q
-        false, true,     false, true, true, false, true, // clock up and data 0
-        false, true,     true,  true, true, true, false, // clock up and data 1
+      /* L D  C  p  c  Q ~Q */
+        0, 0, 1, 1, 1, 0, 1, /* Clk up and D = 0 */
+        0, 1, 1, 1, 1, 1, 0, /* Clk up and D = 1 */
 
-        false, false,    false,  false, true, true, false, // set = false
-        false, true,     false,  true, false, false, true, // reset = false
-        false, true,     false,  false, false, true, true, // clear and reset = false
+        0, 0, 0, 0, 1, 1, 0, /* Preset = false */
+        0, 0, 1, 1, 0, 0, 1, /* Clear = false */
+        0, 0, 1, 0, 0, 1, 1, /* Clear and Preset = false */
 
-        true, false,    false,  true, true, true, false, // clock low and data = 0 (maintain current state)
-        true, false,    true,   true, true, true, false // clock low and data = 1 (maintain current state)
+        1, 0, 0, 1, 1, 1, 0, /* Clk dwn and D = 0 (must maintain current state)*/
+        1, 1, 0, 1, 1, 1, 0, /* Clk dwn and D = 1 (must maintain current state)*/
     };
 
     DFlipFlop flipflop(false, false, false, false);
     for (int i = 0; i < 49; i+=7)
     {
-        flipflop.update(testData[i], testData[i+2], false, false);
+        flipflop.update(testData[i], testData[i+1], false, false);
         flipflop.process();
 
-        flipflop.update(testData[i+1], testData[i+2], testData[i+3], testData[i+4]);
+        flipflop.setQ(testData[i]);
+        flipflop.setQB(!testData[i]);
+
+        flipflop.update(testData[i+2], testData[i+1], testData[i+3], testData[i+4]);
         flipflop.process();
 
-        ASSERT_EQ(testData[i+6], flipflop.Q());
+        ASSERT_EQ(testData[i+5], flipflop.Q());
         ASSERT_EQ(testData[i+6], flipflop.QB());
     }
-
 }
 
 int main(int argc, char **argv) {

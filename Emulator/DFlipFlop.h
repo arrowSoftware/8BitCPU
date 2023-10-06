@@ -13,6 +13,8 @@ class DFlipFlop : public Circuit
         inline bool QB(void) { return _QB; }
 
         void update(bool enable, bool A, bool S, bool R);
+        inline void setQ(bool Q) {_Q = Q;}
+        inline void setQB(bool QB) {_QB = QB;}
         bool process(void);
     private:
         bool _enable; // Edge triggered pulse

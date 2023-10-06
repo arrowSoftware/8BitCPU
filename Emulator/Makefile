@@ -10,7 +10,7 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
+GTEST_DIR = C:/Users/tyler/OneDrive/Documents/googletest/googletest
 
 # Where to find user code.
 USER_DIR = .

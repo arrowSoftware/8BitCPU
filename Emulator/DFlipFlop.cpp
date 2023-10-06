@@ -19,7 +19,6 @@ void DFlipFlop::update(bool enable, bool A, bool S, bool R)
 
 bool DFlipFlop::process()
 {
-    printf("E:%d A:%d S:%d R:%d, Q:%d QB:%d\n",_enable, _A, _S, _R, _Q, _QB);
     if (_enable && !_lastEnable)
     {
         _Q = _lastA;
