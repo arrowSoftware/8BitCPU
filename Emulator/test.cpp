@@ -1,245 +1,184 @@
-#include "Clock.h"
-#include "LogicGate.h"
-#include "HalfAdder.h"
-#include "FullAdder.h"
-#include "EightBitAdder.h"
-#include "DLatch.h"
-#include "DFlipFlop.h"
+#include "Register.hpp"
+#include "CounterRegister.hpp"
+#include "ProgramLoader.hpp"
+#include "RAM.hpp"
 
 #include <stdio.h>
-
 #include <gtest/gtest.h>
 
-TEST(testLogicAND, FullCircuit)
-{
-    bool testData[12] = {
-        false, false, false,
-        false, true, false,
-        true, false, false,
-        true, true, true
-    };
-
-    for (int i = 0; i < 12; i+=3)
-    {
-        LogicANDGate gate(testData[i], testData[i+1]);
-        ASSERT_EQ(gate.process(), testData[i+2]);
-    }
+TEST(DataBusTest, LoadAndRead) {
+    DataBus<uint8_t> dataBus;
+    dataBus.load(0xFF);
+    ASSERT_EQ(0xFF, dataBus.read());
 }
 
-TEST(testLogicOR, FullCircuit)
-{
-    bool testData[12] = {
-        false, false, false,
-        false, true, true,
-        true, false, true,
-        true, true, true
-    };
-
-    for (int i = 0; i < 12; i+=3)
-    {
-        LogicORGate gate(testData[i], testData[i+1]);
-        ASSERT_EQ(gate.process(), testData[i+2]);
-    }
+TEST(DataBusTest, Size) {
+    DataBus<uint8_t> dataBus;
+    ASSERT_EQ(8, dataBus.size());
 }
 
-TEST(testLogicXOR, FullCircuit)
-{
-    bool testData[12] = {
-        false, false, false,
-        false, true, true,
-        true, false, true,
-        true, true, false
-    };
-
-    for (int i = 0; i < 12; i+=3)
-    {
-        LogicXORGate gate(testData[i], testData[i+1]);
-        ASSERT_EQ(gate.process(), testData[i+2]);
-    }
+TEST(RegisterTest, LoadWithoutClock) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> registerA(&dataBus);
+    dataBus.load(0xFF);
+    registerA.load();
+    ASSERT_EQ(0, registerA.peak());
 }
 
-TEST(testLogicNOT, FullCircuit)
-{
-    bool testData[4] = {
-        false, true,
-        true, false
-    };
-
-    for (int i = 0; i < 4; i+=2)
-    {
-        LogicNOTGate gate(testData[i]);
-        ASSERT_EQ(gate.process(), testData[i+1]);
-    }
+TEST(RegisterTest, LoadWithClock) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> registerA(&dataBus);
+    dataBus.load(0xFF);
+    registerA.clock(true);
+    registerA.load();
+    ASSERT_EQ(0xFF, registerA.peak());
 }
 
-TEST(testLogicNAND, FullCircuit)
-{
-    bool testData[12] = {
-        false, false, true,
-        false, true, true,
-        true, false, true,
-        true, true, false
-    };
-
-    for (int i = 0; i < 12; i+=3)
-    {
-        LogicNANDGate gate(testData[i], testData[i+1]);
-        ASSERT_EQ(gate.process(), testData[i+2]);
-    }
+TEST(RegisterTest, Output) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> registerA(&dataBus);
+    dataBus.load(0xFF);
+    registerA.clock(true);
+    registerA.load();
+    dataBus.load(0x55);
+    registerA.output();
+    ASSERT_EQ(0xFF, dataBus.read());
 }
 
-TEST(testLogicNOR, FullCircuit)
-{
-    bool testData[12] = {
-        false, false, true,
-        false, true, false,
-        true, false, false,
-        true, true, false
-    };
-
-    for (int i = 0; i < 12; i+=3)
-    {
-        LogicNORGate gate(testData[i], testData[i+1]);
-        ASSERT_EQ(gate.process(), testData[i+2]);
-    }
+TEST(CounterRegisterTest, CountWithoutClock) {
+    DataBus<uint8_t> dataBus;
+    CounterRegister<uint8_t> pc(&dataBus);
+    pc.enable();
+    ASSERT_EQ(0, pc.peak());
 }
 
-TEST(testLogicXNOR, FullCircuit)
-{
-    bool testData[12] = {
-        false, false, true,
-        false, true, false,
-        true, false, false,
-        true, true, true
-    };
-
-    for (int i = 0; i < 12; i+=3)
-    {
-        LogicXNORGate gate(testData[i], testData[i+1]);
-        ASSERT_EQ(gate.process(), testData[i+2]);
-    }
+TEST(CounterRegisterTest, CountWithClock) {
+    DataBus<uint8_t> dataBus;
+    CounterRegister<uint8_t> pc(&dataBus);
+    pc.clock(true);
+    pc.enable();
+    ASSERT_EQ(1, pc.peak());
 }
 
-TEST(testHalfAdder, FullCircuit)
-{
-    bool testData[] = {
-        //A    B      Sum    Carry
-        false, false, false, false,
-        false, true, true, false,
-        true, false, true, false,
-        true, true, false, true
-    };
-
-    for (int i = 0; i < 16; i+=4)
-    {
-        HalfAdder ha(testData[i], testData[i+1]);
-        ha.process();
-        ASSERT_EQ(ha.sum(), testData[i+2]);
-        ASSERT_EQ(ha.carry(), testData[i+3]);
+TEST(CounterRegisterTest, output) {
+    DataBus<uint8_t> dataBus;
+    CounterRegister<uint8_t> pc(&dataBus);
+    pc.clock(true);
+    for (int i = 0; i < 20; i++) {
+        pc.enable();
     }
+    dataBus.load(0xFF);
+    pc.output();
+    ASSERT_EQ(20, dataBus.read());
 }
 
-TEST(testFullAdder, FullCircuit)
-{
-    bool testData[] = {
-        //A    B      Ci     Sum    Carry
-        false, false, false, false, false,
-        false, false, true, true, false,
-        false, true, false, true, false,
-        false, true, true, false, true,
-        true, false, false, true, false,
-        true, false, true, false, true,
-        true, true, false, false, true,
-        true, true, true, true, true,
-    };
-
-    for (int i = 0; i < 40; i+=5)
-    {
-        FullAdder fa(testData[i], testData[i+1], testData[i+2]);
-        fa.process();
-        ASSERT_EQ(fa.sum(), testData[i+3]);
-        ASSERT_EQ(fa.carry(), testData[i+4]);
+TEST(CounterRegisterTest, reset) {
+    DataBus<uint8_t> dataBus;
+    CounterRegister<uint8_t> pc(&dataBus);
+    pc.clock(true);
+    for (int i = 0; i < 20; i++) {
+        pc.enable();
     }
+    pc.reset();
+    dataBus.load(0xFF);
+    pc.output();
+    ASSERT_EQ(0, dataBus.read());
 }
 
-TEST(testEightBitAdder, FullCircuit)
-{
-    for (int i = 0; i < 255; i++)
-    {
-        for (int j = 0; j < 255; j++)
-        {
-            EightBitData A; A.set(i);
-            EightBitData B; B.set(j);
-            EightBitAdder eba(A, B, 0);
-            eba.process();
-            ASSERT_TRUE( ((eba.sum().data.byte == (A.data.byte + B.data.byte)) || (((A.data.byte + B.data.byte) > 0xFF) && eba.carry())) );
-        }
+TEST(CounterRegisterTest, load) {
+    DataBus<uint8_t> dataBus;
+    CounterRegister<uint8_t> pc(&dataBus);
+    dataBus.load(20);
+    pc.clock(true);
+    pc.load();
+    for (int i = 0; i < 20; i++) {
+        pc.enable();
     }
+    dataBus.load(0xFF);
+    pc.output();
+    ASSERT_EQ(40, dataBus.read());
 }
 
-TEST(DLatchTest, FullCircuit)
-{
-    DLatch dlatch(false, false);
+TEST(ProgramLoaderTest, Operate) {
+    DataBus<uint8_t> dataBus;
+    ROM<uint8_t> rom;
+    uint8_t programData[3] = {0xFF, 0x55, 0x11};
+    rom.program(programData, 3);
 
-    dlatch.process();
-    ASSERT_EQ(false, dlatch.Q());
-    ASSERT_EQ(true, dlatch.QB());
+    ProgramLoader<uint8_t> pl(&dataBus, &rom);
 
-    dlatch.update(false, true);
-    dlatch.process();
-    ASSERT_EQ(false, dlatch.Q());
-    ASSERT_EQ(true, dlatch.QB());
+    dataBus.load(0xAA);
+    ASSERT_EQ(0xAA, dataBus.read());
 
-    dlatch.update(true, false);
-    dlatch.process();
-    ASSERT_EQ(false, dlatch.Q());
-    ASSERT_EQ(true, dlatch.QB());
+    pl.enable();
+    ASSERT_EQ(0, dataBus.read());
 
-    dlatch.update(true, true);
-    dlatch.process();
-    ASSERT_EQ(true, dlatch.Q());
-    ASSERT_EQ(false, dlatch.QB());
+    pl.clock(true);
+    ASSERT_EQ(0xFF, dataBus.read());
 
-    dlatch.update(false, false);
-    dlatch.process();
-    ASSERT_EQ(true, dlatch.Q());
-    ASSERT_EQ(false, dlatch.QB());
+    pl.clock(true);
+    ASSERT_EQ(1, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(0x55, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(2, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(0x11, dataBus.read());
+
+    pl.clock(false);
+    ASSERT_EQ(0x11, dataBus.read());
 }
 
-TEST(DFlipFlopTest, FullCircuit)
-{
-    // https://github.com/GIBIS-UNIFESP/wiRedPanda/blob/351d47990e14f8e105cac3a0e5481c1840cfcaaa/test/testlogicelements.cpp#L159
-    bool testData[] = {
-      /* L D  C  p  c  Q ~Q */
-        0, 0, 1, 1, 1, 0, 1, /* Clk up and D = 0 */
-        0, 1, 1, 1, 1, 1, 0, /* Clk up and D = 1 */
+TEST(RAMTest, readWrite) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> memporyRegister(&dataBus);
+    RAM<uint8_t> ram(&dataBus, &memporyRegister);
 
-        0, 0, 0, 0, 1, 1, 0, /* Preset = false */
-        0, 0, 1, 1, 0, 0, 1, /* Clear = false */
-        0, 0, 1, 0, 0, 1, 1, /* Clear and Preset = false */
+    // Load the bus with an address
+    dataBus.load(10);
+    
+    // store the address in the register
+    memporyRegister.clock(true);
+    memporyRegister.load();
 
-        1, 0, 0, 1, 1, 1, 0, /* Clk dwn and D = 0 (must maintain current state)*/
-        1, 1, 0, 1, 1, 1, 0, /* Clk dwn and D = 1 (must maintain current state)*/
-    };
+    // Load the bus with data
+    dataBus.load(0xFF);
 
-    DFlipFlop flipflop(false, false, false, false);
-    for (int i = 0; i < 49; i+=7)
-    {
-        flipflop.update(testData[i], testData[i+1], false, false);
-        flipflop.process();
+    // store the data on the bus in RAM
+    ram.write();
 
-        flipflop.setQ(testData[i]);
-        flipflop.setQB(!testData[i]);
+    // reset the databus
+    dataBus.load(0);
 
-        flipflop.update(testData[i+2], testData[i+1], testData[i+3], testData[i+4]);
-        flipflop.process();
+    // load the bus with an address
+    dataBus.load(10);
 
-        ASSERT_EQ(testData[i+5], flipflop.Q());
-        ASSERT_EQ(testData[i+6], flipflop.QB());
-    }
+    // store the address in the memory register
+    memporyRegister.clock(true);
+    memporyRegister.load();
+
+    // reset the data bus
+    dataBus.load(0);
+
+    // read the data from the RAM
+    ram.read();
+
+    // check result
+    ASSERT_EQ(0xFF, dataBus.read());
+
+    // Attempt to read RAM without data
+    dataBus.load(5);
+    memporyRegister.clock(true);
+    memporyRegister.load();
+    dataBus.load(0x55);
+    ram.read();
+    ASSERT_EQ(0, dataBus.read());
 }
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-}
+}      
