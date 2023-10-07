@@ -5,6 +5,8 @@
 #include "ROM.hpp"
 #include "DataBus.hpp"
 
+#include <stdio.h>
+
 template <class T>
 class ProgramLoader
 {
@@ -15,7 +17,9 @@ class ProgramLoader
             _dataBus(dataBus), 
             _addressWrite(true), 
             _dataWrite(false),
-            _firstEnable(true) {
+            _firstEnable(true),
+            _clock(false),
+            _reset(false) {
 
         }
 
@@ -31,24 +35,35 @@ class ProgramLoader
         
         void reset() {
             _counter.reset();
+            _clock = false;
+            // maybe use a clock class pointer that all uses.
+            // reset turns the clock off. TODO
+            _reset = true;
         }
 
         void clock(bool high) {
+            _clock = high;
             _counter.clock(high);
 
-            if (high) {   
+            if (_clock) {   
                 _addressWrite = !_addressWrite;
                 _dataWrite = !_dataWrite;
             }
 
-            if (_addressWrite && high) {
-                _counter.enable();
+            if (_addressWrite && _clock) {
+                // Dont incremenet the counter if we just reset, we need to consume the 0 count.
+                if (!_reset) {
+                    _counter.enable();
+                }
                 _dataBus->load(_counter.peak());
-            } else if (_dataWrite && high) {
+            } else if (_dataWrite && _clock) {
                 // Get the count from the counter and write it to the data bus.
                 _dataBus->load(_rom->read(_counter.peak()));
             }
 
+            if (_clock) {
+                _reset = false;
+            }
         }
 
     protected:
@@ -59,6 +74,8 @@ class ProgramLoader
         bool _addressWrite;
         bool _dataWrite;
         bool _firstEnable;
+        bool _clock;
+        bool _reset;
 };
 
 #endif // __ProgramLoader_H__                                   

@@ -25,6 +25,7 @@ class ROM
             if (address < 512) {
                 return _data[address];
             }
+            return 0;
         }
     protected:
     private:

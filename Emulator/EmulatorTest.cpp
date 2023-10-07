@@ -132,17 +132,54 @@ TEST(ProgramLoaderTest, Operate) {
     ASSERT_EQ(0x11, dataBus.read());
 }
 
+TEST(ProgramLoaderTest, Reset) {
+    DataBus<uint8_t> dataBus;
+    ROM<uint8_t> rom;
+    uint8_t programData[3] = {0xFF, 0x55, 0x11};
+    rom.program(programData, 3);
+
+    ProgramLoader<uint8_t> pl(&dataBus, &rom);
+
+    dataBus.load(0xAA);
+    ASSERT_EQ(0xAA, dataBus.read());
+
+    pl.enable();
+    ASSERT_EQ(0, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(0xFF, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(1, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(0x55, dataBus.read());
+
+    pl.reset();
+    pl.clock(true);
+    ASSERT_EQ(0, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(0xFF, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(1, dataBus.read());
+
+    pl.clock(true);
+    ASSERT_EQ(0x55, dataBus.read());
+}
+
 TEST(RAMTest, readWrite) {
     DataBus<uint8_t> dataBus;
-    Register<uint8_t> memporyRegister(&dataBus);
-    RAM<uint8_t> ram(&dataBus, &memporyRegister);
+    Register<uint8_t> memoryRegister(&dataBus);
+    RAM<uint8_t> ram(&dataBus, &memoryRegister);
 
     // Load the bus with an address
     dataBus.load(10);
     
     // store the address in the register
-    memporyRegister.clock(true);
-    memporyRegister.load();
+    memoryRegister.clock(true);
+    memoryRegister.load();
 
     // Load the bus with data
     dataBus.load(0xFF);
@@ -157,8 +194,8 @@ TEST(RAMTest, readWrite) {
     dataBus.load(10);
 
     // store the address in the memory register
-    memporyRegister.clock(true);
-    memporyRegister.load();
+    memoryRegister.clock(true);
+    memoryRegister.load();
 
     // reset the data bus
     dataBus.load(0);
@@ -171,11 +208,55 @@ TEST(RAMTest, readWrite) {
 
     // Attempt to read RAM without data
     dataBus.load(5);
-    memporyRegister.clock(true);
-    memporyRegister.load();
+    memoryRegister.clock(true);
+    memoryRegister.load();
     dataBus.load(0x55);
     ram.read();
     ASSERT_EQ(0, dataBus.read());
+}
+
+TEST(LoadProgramToRAMFromROM, loading) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> memoryRegister(&dataBus);
+    ROM<uint8_t> rom;
+    uint8_t programData[7] = {0xFF, 0x55, 0x11, 0x21, 0x34, 0x54, 0x54};
+    rom.program(programData, 7);
+    ProgramLoader<uint8_t> pl(&dataBus, &rom);
+    RAM<uint8_t> ram(&dataBus, &memoryRegister);
+
+    pl.enable(); // load bus with first rom address
+    for (int i = 0; i < 7; i++) {
+        memoryRegister.clock(true);
+        memoryRegister.load(); // load memory register with address from bus
+        pl.clock(true); // load the data at address 0 from ROM to the bus
+        ram.write(); // write the data on the bus to the address stored in the memory address.
+        ASSERT_EQ(programData[i], ram.peak(i));
+        pl.clock(true);
+    }
+}
+
+TEST(LoadProgramToRAMFromROM, FullLoad) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> memoryRegister(&dataBus);
+    ROM<uint8_t> rom;
+    uint8_t programData[256] = {0};
+    for (int i = 0; i < 256; i++) {
+        programData[i] = i;
+    }
+
+    rom.program(programData, 256);
+    ProgramLoader<uint8_t> pl(&dataBus, &rom);
+    RAM<uint8_t> ram(&dataBus, &memoryRegister);
+
+    pl.enable(); // load bus with first rom address
+    for (int i = 0; i < 256; i++) {
+        memoryRegister.clock(true);
+        memoryRegister.load(); // load memory register with address from bus
+        pl.clock(true); // load the data at address 0 from ROM to the bus
+        ram.write(); // write the data on the bus to the address stored in the memory address.
+        ASSERT_EQ(programData[i], ram.peak(i));
+        pl.clock(true);
+    }
 }
 
 int main(int argc, char **argv) {

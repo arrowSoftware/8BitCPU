@@ -33,14 +33,18 @@ class RAM
             }
         }
 
-        T read(void) {
+        void read(void) {
             int address = _memoryRegister->peak();
             // write data to the data bus from ram
             if (address < 256) {
                 _dataBus->load(_data[address]);
             }
-
         }
+
+        T peak(int address) {
+            return _data[address];
+        }
+
     protected:
     private:
         DataBus<T> *_dataBus;

@@ -10,7 +10,8 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
+#GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
+GTEST_DIR = C:/Users/tyler/OneDrive/Documents/googletest/googletest
 #GTEST_DIR = /usr/src/gtest
 
 # Where to find user code.
@@ -52,7 +53,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : $(TARGET)
 
 clean :
-	rm -f gtest.a gtest_main.a *.o $(TARGET)
+	del gtest.a gtest_main.a *.o $(TARGET)
 
 # Builds gtest.a and gtest_main.a.
 
