@@ -16,7 +16,7 @@ GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
 # Where to find user code.
 USER_DIR = .
 
-USER_SRCS  = Test.cpp \
+USER_SRCS  = EmulatorTest.cpp \
 			 ALU.cpp  \
 			 CounterRegister.hpp \
 			 InstructionDecoder.cpp \
