@@ -2,6 +2,38 @@
 8-Bit CPU
 
 
+## Instruction set
+NOP working
+HALT working
+LDA NUM
+LDA [ADDR]
+STR [ADDR]
+LDB NUM
+LDB [ADDR]
+STB [ADDR]
+ADD NUM
+ADD [ADDR]
+SUB NUM
+SUB [ADDR]
+AND NUM
+AND [ADDR]
+OR NUM 
+OR [ADDR]
+XOR NUM
+XOR [ADDR]
+NOT A
+NOT [ADDR]
+OUT A
+OUT B
+OUT NUM
+OUT [ADDR]
+JP [ADDR]
+JPZ0 [ADDR]
+JPZ1 [ADDR]
+JPC0 [ADDR]
+JPC1 [ADDR]
+RST
+
 ## Registers
 ### D-Flip Flop
 ![D-FLip FLop with set and reset](/Images/D-FlipFlop.png)
