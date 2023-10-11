@@ -135,6 +135,10 @@
 
 ## Registers
 ### D-Flip Flop
+<p align="center" width="100%">
+  <img src="/Images/D-FlipFlop.png" alt="D-FLip FLop with set and reset"/>
+</p>
+
 ![D-FLip FLop with set and reset](/Images/D-FlipFlop.png)
 
 ![D-FLip FLop with set and reset](/Images/D-FlipFlop.gif)
