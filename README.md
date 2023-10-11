@@ -136,12 +136,11 @@
 ## Registers
 ### D-Flip Flop
 <p align="center" width="100%">
-  <img src="/Images/D-FlipFlop.png" alt="D-FLip FLop with set and reset"/>
+  <img src="/Images/D-FlipFlop.png" alt="D-FLip Flop with set and reset"/>
 </p>
-
-![D-FLip FLop with set and reset](/Images/D-FlipFlop.png)
-
-![D-FLip FLop with set and reset](/Images/D-FlipFlop.gif)
+<p align="center" width="100%">
+  <img src="/Images/D-FlipFlop.gif" alt="D-FLip Flop with set and reset GIF"/>
+</p>
 
 D-Flip Flop will latch (save) whats in the input line (D) when the clock signal is on the rising edge into the output (Q) and it will store the invserse in output (Q').  Setting the set flag (S) to 1 will bypass the clock pulse and latch the output (Q) to 1 and the output (Q') to 0.  Setting the reset flag (R) to 1 will bypass the clock pulse and latch the output (Q) to a 0 and the output (Q') to a 1.
 
