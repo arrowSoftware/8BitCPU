@@ -132,6 +132,8 @@
 |UNUSED       |11110   |   |   |   |   |      |   |   |   |   |     |   |   |   |   |   |   |   |   |   |   |   |   |   |        | 00000         |
 |RST          |11111   |   |   |   |   |      |   |   |   |   |     |   |   |   |   |   |   |   |   |   |   |   |   |   |        | 00000         |
 
+## Logisim Instructions Testing
+gif of each instruction working
 
 ## Registers
 ### D-Flip Flop
