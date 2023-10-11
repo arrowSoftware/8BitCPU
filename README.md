@@ -2,6 +2,111 @@
 8-Bit CPU
 
 
+## Instruction set
+  * CF = Carry Flag
+  * ZF = Zero flag.
+  * NF = Negative flag.
+  * VF = Overflow flag.
+
+* FLG = FLAG REGISTER
+  * FI = Enable flag register load.
+    * Loads the flags register with the value currently on the data bus.
+    * Available flags:
+    * | Flag | Description   |
+      |------|---------------|
+      | CF   | Carry Flag    |
+      | ZF   | Zero Flag     |
+      | NF   | Negative Flag |
+      | VF   | Overflow Flag |
+* CL = CLOCK
+  * HLT = Halt clock.
+    * Stops the clock.
+* AR = A REGISTER
+  * AI = Enable A register load.
+    * Loads the A register with the value currently on the data bus.
+  * AO = Enable A regsiter output.
+    * Outputs the current register value to the data bus.
+* ALU = ALGORITHMIC AND LOGIC UNIT
+  * EO = Enable ALU output.
+    * Outputs the current ALU operation result to the data bus.
+  * CI = Carry in flag.
+    * Carry in flag from Flag register
+  * SEL = ALU operation select code
+    * 3 bit number for selecting the ALU operation.
+    * | code | operation      |
+      |------|----------------|
+      |000   | A OR B         |
+      |001   | NOT A          |
+      |010   | A + NOT B + Ci |
+      |011   | A + B + Ci     |
+      |100   | A XOR B        |
+      |101   | A AND B        |
+      |110   | A - 1 + Ci     |
+* BR = B REGISTER
+  * BI = Enable B register load.
+    * Loads the A register with the value currently on the data bus.
+  * BO = Enable B regsiter output.
+    * Outputs the current register value to the data bus.
+* MR = MEMORY REGISTER
+  * MI = Enable memory register load.
+    * Loads the memory register with the value currently on the data bus.
+* RAM = RANDOM ACCESS MEMORY
+  * RW = Enable RAM write.
+    * Writes the value currently on the data bus into the selected memory banks.
+  * RR = Enable RAM read.
+    * Outputs the value stored in the selected memory bank to the data bus.
+* IR = INSTRUCTION REGISTER
+  * II = Enable instruction register load.
+    * Loads the instruction register with the value currently on the data bus.
+  * IR = Reset instruction register.
+    * Resets the instruction decoder counter back to 0. (Fetch next instruction set)
+* PC = PROGRAM COUNTER REGISTER
+  * CE = Enable counter register.
+    * Enables the program counter to process the count.
+  * CO = Enable counter register output.
+    * Ouputs the current register value to the data bus.
+  * JP = Enable counter register load.
+    * Loads the program counter register with the value currently on the data bus.
+* OR = OUTPUT REGISTER
+  * OI = Enable output register load.
+    * Loads the output register with the value currently on the data bus.
+
+
+| Instruction | OpCode |CF|ZF| STEP |FI|HL|AI|AO|EO|SU|BI|BO|MI|RW|RR|II|IR|CE|CO|JP|OI| OpCode | Control Flags |
+|-------------|--------|--|--|------|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--------|---------------|
+| FETCH INSTR | XXXX   |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| FIN INST    | XXXX   |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| NOP         | 00000       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| HALT        | 00001       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| LDA NUM     | 00010       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| LDA [ADDR]  | 00011       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| STR [ADDR]  | 00100       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| LDB NUM     | 00101       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| LDB [ADDR]  | 00110       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| STB [ADDR]  | 00111       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| ADD NUM     | 01000       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| ADD [ADDR]  | 01001       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| SUB NUM     | 01010       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| SUB [ADDR]  | 01011       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| AND NUM     | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| AND [ADDR]  | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| OR NUM      | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| OR [ADDR]   | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| XOR NUM     | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| XOR [ADDR]  | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| NOT A       | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| NOT [ADDR]  | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| OUT A       | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| OUT B       | ?????       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| OUT NUM     | ?       |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| OUT [ADDR]  |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| JP [ADDR]   |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| JPZ0 [ADDR] |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| JPZ1 [ADDR] |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| JPC0 [ADDR] |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| JPC1 [ADDR] |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+| RST         |        |  |  |      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |        |               |
+
 ## Registers
 ### D-Flip Flop
 ![D-FLip FLop with set and reset](/Images/D-FlipFlop.png)
@@ -89,7 +194,7 @@ Available registers in this project.
   ![8-Bit counter reference](/Images/8-BitCounter.png)
 
   ![8-Bit counter reference](/Images/8-BitCounter.gif)
-  
+
   Inputs
   - **Enable Out[EnO]** - Enables the output pins
   - **Enable[En]** - Enables the counter
@@ -97,7 +202,7 @@ Available registers in this project.
   - **Write[L]** - Write the input value A0:A8 to the current count value.
   - **Clock[Clk]** - Clock pulse
   - **A1:A8** - Data input, used to set the current count value.
-  
+
   Outputs
   - **Q1:Q8** - Data output pins.
   - **S1:S8** - Imediate data outputs.
