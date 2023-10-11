@@ -3,11 +3,6 @@
 
 
 ## Instruction set (CISC)
-  * CF = Carry Flag
-  * ZF = Zero flag.
-  * NF = Negative flag.
-  * VF = Overflow flag.
-
 * FLG = FLAG REGISTER
   * FI = Enable flag register load.
     * Loads the flags register with the value currently on the data bus.
