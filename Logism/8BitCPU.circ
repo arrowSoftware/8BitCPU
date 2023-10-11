@@ -966,15 +966,15 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
       <circ-anchor facing="east" height="6" width="6" x="87" y="57"/>
     </appear>
     <wire from="(160,120)" to="(190,120)"/>
-    <wire from="(120,100)" to="(180,100)"/>
     <wire from="(220,90)" to="(230,90)"/>
     <wire from="(220,130)" to="(230,130)"/>
+    <wire from="(120,80)" to="(160,80)"/>
     <wire from="(160,80)" to="(160,120)"/>
+    <wire from="(140,100)" to="(140,140)"/>
+    <wire from="(140,100)" to="(180,100)"/>
     <wire from="(140,140)" to="(190,140)"/>
-    <wire from="(120,80)" to="(140,80)"/>
+    <wire from="(120,100)" to="(140,100)"/>
     <wire from="(160,80)" to="(180,80)"/>
-    <wire from="(140,80)" to="(160,80)"/>
-    <wire from="(140,80)" to="(140,140)"/>
     <comp lib="0" loc="(230,90)" name="Pin">
       <a name="facing" val="west"/>
       <a name="output" val="true"/>
