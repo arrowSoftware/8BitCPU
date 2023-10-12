@@ -177,26 +177,20 @@
 ### Logisim Instructions Testing
 #### NOP & HLT
 ```asm
-  JMP start
-
-start:
-  NOP
-  HLT
+00:  NOP # No operation
+01:  HLT # Halt the clock
 ```
 ```asm
 v2.0 raw
-00 00
+00
 01
 ```
 ![NOP and HLT test](/Images/Test_NOP_HLT.gif)
 
 #### LDA [NUM]
 ```asm
-  JMP start
-
-start:
-  LDA 0x55
-  HLT
+00:  LDA 0x55 # Load A register with value 0x55
+02:  HLT # Halt the clock
 ```
 ```asm
 v2.0 raw
@@ -207,14 +201,10 @@ v2.0 raw
 
 #### LDA [ADDR]
 ```asm
-  JMP start
+# 0x04 variable
 
-variable:
-  DB 0xAA
-
-start:
-  LDA [variable]
-  HLT
+00:  LDA [variable] # Load A register with value at address [variable]
+02:  HLT # Halt the clock
 ```
 ```asm
 v2.0 raw
@@ -226,15 +216,11 @@ aa 00
 
 #### STA [ADDR]
 ```asm
-  JMP start
+# 0x05 variablePtr
 
-variablePtr:
-  DB 0x05
-
-start:
-  LDA 0xAA
-  STA [variablePtr]
-  HLT
+00: LDA 0xAA # Load A register with value 0xAA
+02: STA [variablePtr] # Store value in A register at memory address [variablePtr]
+04: HLT # Halt the clock
 ```
 ```asm
 v2.0 raw
