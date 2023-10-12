@@ -176,11 +176,11 @@
 
 ### Logisim Instructions Testing
 #### NOP & HLT
-```asm
+```nasm
 00:  NOP # No operation
 01:  HLT # Halt the clock
 ```
-```asm
+```nasm
 v2.0 raw
 00
 01
@@ -188,11 +188,11 @@ v2.0 raw
 ![NOP and HLT test](/Images/Test_NOP_HLT.gif)
 
 #### LDA [NUM]
-```asm
+```nasm
 00:  LDA 0x55 # Load A register with value 0x55
 02:  HLT # Halt the clock
 ```
-```asm
+```nasm
 v2.0 raw
 02 55
 01
@@ -200,13 +200,13 @@ v2.0 raw
 ![LDA NUM test](/Images/Test_LDA_NUM.gif)
 
 #### LDA [ADDR]
-```asm
+```nasm
 # 0x04 variable
 
 00:  LDA [variable] # Load A register with value at address [variable]
 02:  HLT # Halt the clock
 ```
-```asm
+```nasm
 v2.0 raw
 03 04
 01 00
@@ -215,20 +215,63 @@ aa 00
 ![LDA ADDR test](/Images/Test_LDA_ADDR.gif)
 
 #### STA [ADDR]
-```asm
+```nasm
 # 0x05 variablePtr
 
 00: LDA 0xAA # Load A register with value 0xAA
 02: STA [variablePtr] # Store value in A register at memory address [variablePtr]
 04: HLT # Halt the clock
 ```
-```asm
+```nasm
 v2.0 raw
 02 55
 04 05
 01
 ```
-![LDA ADDR test](/Images/Test_STA_ADDR.gif)
+![STA ADDR test](/Images/Test_STA_ADDR.gif)
+
+#### LDB [NUM]
+```nasm
+00:  LDB 0x55 # Load B register with value 0x55
+02:  HLT # Halt the clock
+```
+```nasm
+v2.0 raw
+05 55
+01
+```
+![LDB NUM test](/Images/Test_LDB_NUM.gif)
+
+#### LDB [ADDR]
+```nasm
+# 0x04 variable
+
+00:  LDB [variable] # Load B register with value at address [variable]
+02:  HLT # Halt the clock
+```
+```nasm
+v2.0 raw
+06 04
+01 00
+aa 00
+```
+![LDB ADDR test](/Images/Test_LDB_ADDR.gif)
+
+#### STB [ADDR]
+```nasm
+# 0x05 variablePtr
+
+00: LDB 0xAA # Load B register with value 0xAA
+02: STB [variablePtr] # Store value in B register at memory address [variablePtr]
+04: HLT # Halt the clock
+```
+```nasm
+v2.0 raw
+05 55
+07 05
+01
+```
+![STB ADDR test](/Images/Test_STB_ADDR.gif)
 
 #### NOP
 #### NOP

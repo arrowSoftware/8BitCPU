@@ -847,7 +847,7 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <comp loc="(1460,750)" name="8-Bit 7 segment decoder"/>
     <comp lib="4" loc="(1750,670)" name="ROM">
       <a name="contents">addr/data: 8 8
-3 4 1 1 aa
+5 55 7 5 1
 </a>
     </comp>
     <comp lib="5" loc="(1230,460)" name="Hex Digit Display"/>
