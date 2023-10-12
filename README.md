@@ -188,10 +188,6 @@ v2.0 raw
 00 00
 01
 ```
-<p align="center" width="100%">
-  <img src="/Images/Test_NOP_HLT.gif" alt="NOP and HLT test"/>
-</p>
-
 ![NOP and HLT test](/Images/Test_NOP_HLT.gif)
 
 #### LDA [NUM]
@@ -207,10 +203,6 @@ v2.0 raw
 02 55
 01
 ```
-<p align="center" width="100%">
-  <img src="/Images/Test_LDA_NUM.gif" alt="LDA NUM test"/>
-</p>
-
 ![LDA NUM test](/Images/Test_LDA_NUM.gif)
 
 #### LDA [ADDR]
@@ -230,10 +222,6 @@ v2.0 raw
 01 00
 aa 00
 ```
-<p align="center" width="100%">
-  <img src="/Images/Test_LDA_ADDR.gif" alt="LDA ADDR test"/>
-</p>
-
 ![LDA ADDR test](/Images/Test_LDA_ADDR.gif)
 
 #### STA [ADDR]
@@ -254,10 +242,6 @@ v2.0 raw
 04 05
 01
 ```
-<p align="center" width="100%">
-  <img src="/Images/Test_STA_ADDR.gif" alt="LDA ADDR test"/>
-</p>
-
 ![LDA ADDR test](/Images/Test_STA_ADDR.gif)
 
 #### NOP
