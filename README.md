@@ -310,7 +310,41 @@ v2.0 raw
 ![ADD ADDR test](/Images/Test_ADD_ADDR.gif)
 
 #### SUB NUM
+```nasm
+00: LDA 0x08
+02: SUB 0x02
+04: OUTA
+05: HLT
+```
+``` nasm
+v2.0 raw
+02 08
+0A 02
+14
+01
+```
+![SUB NUM test](/Images/Test_SUB_NUM.gif)
+
 #### SUB [ADDR]
+```nasm
+# 0x07 variablePtr
+
+00: LDA 0x08
+02: SUB [variablePtr] # Subtract the value in memory address [variablePtr] from the value in the A register and store the output in the A register
+04: OUTA
+05: HLT
+```
+``` nasm
+v2.0 raw
+02 08
+0B 07
+14
+01
+00
+02
+```
+![SUB ADDR test](/Images/Test_SUB_ADDR.gif)
+
 #### AND NUM
 #### AND [ADDR]
 #### OR NUM
