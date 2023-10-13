@@ -52,16 +52,16 @@ FIN_INSTR =   {"name": "FIN",   "OpCode": 0x00,"steps": 1, "flags": [Flags(IR=1)
 instruction_set = [
     {"name": "NOP",          "OpCode": 0x00,"steps": 3, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + FIN_INSTR["flags"]},
     {"name": "HLT",          "OpCode": 0x01,"steps": 3, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(HLT=1)] + FIN_INSTR["flags"]},
-    {"name": "LDA_NUM",      "OpCode": 0x02,"steps": 4, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CO=1)] + [Flags(AI=1, RR=1, )] + FIN_INSTR["flags"]},
+    {"name": "LDA_NUM",      "OpCode": 0x02,"steps": 4, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(AI=1, RR=1, )] + FIN_INSTR["flags"]},
     {"name": "LDA_ADDR",     "OpCode": 0x03,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(AI=1, RR=1)] + FIN_INSTR["flags"]},
     {"name": "STA_ADDR",     "OpCode": 0x04,"steps": 4, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(AO=1, RW=1)] + FIN_INSTR["flags"]},
     {"name": "LDB_NUM",      "OpCode": 0x05,"steps": 4, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(BI=1, RR=1)] + FIN_INSTR["flags"]},
     {"name": "LDB_ADDR",     "OpCode": 0x06,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(BI=1, RR=1)] + FIN_INSTR["flags"]},
     {"name": "STB_ADDR",     "OpCode": 0x07,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(BO=1, RW=1)] + FIN_INSTR["flags"]},
-    {"name": "ADD_NUM",      "OpCode": 0x08,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1)] + FIN_INSTR["flags"]},
-    {"name": "ADD_ADDR",     "OpCode": 0x09,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(BI=1, RR=1)] + FIN_INSTR["flags"]},
-    {"name": "SUB_NUM",      "OpCode": 0x0A,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(CI=1, BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1, CI=1)] + FIN_INSTR["flags"]},
-    {"name": "SUB_ADDR",     "OpCode": 0x0B,"steps": 6, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(CI=1, BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1, CI=1)] + FIN_INSTR["flags"]},
+    {"name": "ADD_NUM",      "OpCode": 0x08,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1, SEL1=1, SEL2=1)] + FIN_INSTR["flags"]},
+    {"name": "ADD_ADDR",     "OpCode": 0x09,"steps": 6, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1, SEL1=1, SEL2=1)] + FIN_INSTR["flags"]},
+    {"name": "SUB_NUM",      "OpCode": 0x0A,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(CI=1, BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1, CI=1, SEL1=1, SEL2=1)] + FIN_INSTR["flags"]},
+    {"name": "SUB_ADDR",     "OpCode": 0x0B,"steps": 6, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(CI=1, BI=1, RR=1)] + [Flags(FI=1, AI=1, EO=1, CI=1, SEL1=1, SEL2=1)] + FIN_INSTR["flags"]},
     {"name": "AND_NUM",      "OpCode": 0x0C,"steps": 3, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(IR=1)] + FIN_INSTR["flags"]}, # TODO
     {"name": "AND_ADDR",     "OpCode": 0x0D,"steps": 3, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(IR=1)] + FIN_INSTR["flags"]}, # TODO
     {"name": "OR_NUM",       "OpCode": 0x0E,"steps": 3, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(IR=1)] + FIN_INSTR["flags"]}, # TODO
