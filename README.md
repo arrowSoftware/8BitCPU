@@ -353,11 +353,81 @@ v2.0 raw
 #### XOR [ADDR]
 #### NOTA
 #### NOT [ADDR]
+
 #### OUTA
+```nasm
+00: LDA 0x55 # Load A register with value 0x55
+02: OUTA
+03: HLT
+```
+```nasm
+v2.0 raw
+02 55
+14 
+01
+```
+![OUTA test](/Images/Test_OUTA.gif)
+
 #### OUTB
+```nasm
+00: LDB 0x55 # Load B register with value 0x55
+02: OUTB
+03: HLT
+```
+```nasm
+v2.0 raw
+05 55
+15
+01
+```
+![OUTB test](/Images/Test_OUTB.gif)
+
 #### OUT NUM
+```nasm
+00: OUT 0xAA
+02: HLT
+```
+```nasm
+v2.0 raw
+16 aa
+01
+```
+![OUT NUM test](/Images/Test_OUT_NUM.gif)
+
 #### OUT [ADDR]
+```nasm
+# 0x04 variablePtr
+
+00: OUT [variablePtr]
+02: HLT
+
+```
+```nasm
+v2.0 raw
+17 04
+01
+00
+55
+```
+![OUT ADDR test](/Images/Test_OUT_ADDR.gif)
+
 #### JMP [ADDR]
+```nasm
+JMP 0x20
+
+# address 0x20
+LDA 0x55
+OUTA
+HLT
+```
+```nasm
+v2.0 raw
+00: 18 10
+...
+10: 02 55
+12: 14
+13: 01
+```
 #### JPZ [ADDR]
 #### JPC [ADDR]
 #### RST
