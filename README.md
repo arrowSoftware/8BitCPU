@@ -428,8 +428,107 @@ v2.0 raw
 12: 14
 13: 01
 ```
+![JMP ADDR test](/Images/Test_JMP_ADDR.gif)
+
 #### JPZ [ADDR]
+ZF = 1
+```nasm
+00: LDA 0x04
+02: SUB 0x04
+04: JPZ 0x10
+06: OUT 0xFF
+07: HLT
+...
+10: OUT 0x55
+12: HLT
+```
+```nasm
+v2.0 raw
+02 04
+0a 04
+19 10
+16 ff
+01
+00 00
+00 00
+00 00
+00
+16 55
+01
+```
+![JPZ ZF = 1 ADDR test](/Images/Test_JPZ_ADDR_ZF1.gif)
+
+ZF = 0
+```nasm
+00: LDA 0x04
+02: ADD 0x04
+04: JPZ 0x10
+06: OUT 0xFF
+07: HLT
+...
+10: OUT 0x55
+12: HLT
+```
+```nasm
+v2.0 raw
+```
+![JPZ ZF = 0 ADDR test](/Images/Test_JPZ_ADDR_ZF0.gif)
+
 #### JPC [ADDR]
+CF = 0
+```nasm
+00: LDA 0xFE
+02: ADD 0x01
+04: JPC 0x10
+06: OUT 0xFF
+07: HLT
+...
+10: OUT 0x55
+12: HLT
+```
+```nasm
+v2.0 raw
+02 FE
+08 01
+1A 10
+16 FF
+01
+00 00
+00 00
+00 00
+00 
+16 55
+01
+```
+![JPC CF = 0 ADDR test](/Images/Test_JPC_ADDR_CF0.gif)
+
+CF = 1
+```nasm
+00: LDA 0xFE
+02: ADD 0x02
+04: JPC 0x10
+06: OUT 0xFF
+07: HLT
+...
+10: OUT 0x55
+12: HLT
+```
+```nasm
+v2.0 raw
+02 FE
+08 02
+1A 10
+16 FF
+01
+00 00
+00 00
+00 00
+00 
+16 55
+01
+```
+![JPC CF = 1 ADDR test](/Images/Test_JPC_ADDR_CF1.gif)
+
 #### RST
 
 ## Registers

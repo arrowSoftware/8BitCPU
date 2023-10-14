@@ -76,8 +76,8 @@ instruction_set = [
     {"name": "OUT_ADDR",     "OpCode": 0x17,"steps": 5, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(MI=1, RR=1)] + [Flags(RR=1, OI=1)] + FIN_INSTR["flags"]},
     {"name": "JMP_ADDR",     "OpCode": 0x18,"steps": 4, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(RR=1, JP=1)] + FIN_INSTR["flags"]},
     {"name": "JPZ_ADDR_ZF0", "OpCode": 0x19,"steps": 3, "CF": [0,1], "ZF": [0],   "flags": FETCH_INSTR["flags"] + [Flags(CE=1)] + FIN_INSTR["flags"]},
-    {"name": "JPZ_ADDR_ZF1", "OpCode": 0x19,"steps": 3, "CF": [0,1], "ZF": [1],   "flags": FETCH_INSTR["flags"] + [Flags(CE=1)] + FIN_INSTR["flags"]},
-    {"name": "JPC_ADDR_CF0", "OpCode": 0x1A,"steps": 4, "CF": [0],   "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(RR=1, JP=1)] + FIN_INSTR["flags"]},
+    {"name": "JPZ_ADDR_ZF1", "OpCode": 0x19,"steps": 3, "CF": [0,1], "ZF": [1],   "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(RR=1, JP=1)] + FIN_INSTR["flags"]},
+    {"name": "JPC_ADDR_CF0", "OpCode": 0x1A,"steps": 4, "CF": [0],   "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(CE=1)] + FIN_INSTR["flags"]},
     {"name": "JPC_ADDR_CF1", "OpCode": 0x1A,"steps": 4, "CF": [1],   "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(MI=1, CE=1, CO=1)] + [Flags(RR=1, JP=1)] + FIN_INSTR["flags"]},
     {"name": "RST",          "OpCode": 0x1B,"steps": 3, "CF": [0,1], "ZF": [0,1], "flags": FETCH_INSTR["flags"] + [Flags(IR=1)] + FIN_INSTR["flags"]}, # TODO
 ]
