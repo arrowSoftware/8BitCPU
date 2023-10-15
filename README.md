@@ -1,13 +1,86 @@
 # 8BitCPU
 8-Bit CPU
 
+# Table of Contents
+- [References](#references)
+- [TODO](#todo)
+- [Instruction set](#instruction-set)
+  - [Instructions](#instructions)
+  - [Microcodes](#microcodes)
+  - [Instruction microcode decriptions](#instruction-microcode-decriptions)
+  - [Logisim Instructions Testing](#logisim-instructions-testing)
+    - [NOP & HLT](#nop-hlt)
+    - [LDA NUM](#lda-num)
+    - [LDA [ADDR]](#lda-addr)
+    - [STA [ADDR]](#sta-addr)
+    - [LDB [NUM]](#ldb-num)
+    - [LDB [ADDR]](#ldb-addr)
+    - [STB [ADDR]](#stb-addr)
+    - [ADD NUM](#add-num)
+    - [ADD [ADDR]](#add-addr)
+    - [SUB NUM](#sub-num)
+    - [SUB [ADDR]](#sub-addr)
+    - [AND NUM](#add-num)
+    - [AND [ADDR]](#and-addr)
+    - [OR NUM](#or-num)
+    - [OR [ADDR]](#or-addr)
+    - [XOR NUM](#xor-num)
+    - [XOR [ADDR]](#xor-addr)
+    - [NOTA](#nota)
+    - [NOT [ADDR]](#not-addr)
+    - [OUTA](#outa)
+    - [OUTB](#outb)
+    - [OUT NUM](#out-num)
+    - [OUT [ADDR]](#out-addr)
+    - [JMP [ADDR]](#jmp-addr)
+    - [JPZ [ADDR]](#jpz-addr)
+    - [JPC [ADDR]](#jpc-addr)
+    - [RST](#rst)
+    - [Fibinacci test](#fibinacci-test)
+    - [Multiplication test](#multiplication-test)
+- [CPU Design](#cpu-design)
+  - [Register](#register)
+    - [D-Flip-Flop](#d-flip-flop)
+    - [Available registers in this project](#available-registers-in-this-project)
+  - [Half Adder](#half-adder)
+  - [Full Adder](#full-adder)
+  - [8-Bit Adder](#8-bit-adder)
+  - [D-Latch](#d-latch)
+  - [4-Bit Binary Decoder](#4-bit-binary-decoder)
+  - [Multiplexer](#multiplexer)
+    - [1-Bit Multiplexer](#1-bit-multiplexer)
+    - [8-Bit Multiplexer](#8-bit-multiplexer)
+    - [8-Bit 2x1 Multiplexer](#8-bit-2x1-multiplexer)
+    - [8-Bit 4x1 Multiplexer](#8-bit-4x1-multiplexer)
+  - [8-Bit Clear](#8-bit-clear)
+  - [8-Bit Inverter](#8-bit-inverter)
+  - [8-Bit OR](#8-bit-or)
+  - [8-Bit AND](#8-bit-and)
+  - [8-Bit XOR](#8-bit-xor)
+  - [8-Bit ALU](#8-bit-alu)
+  - [4-Bit Decoder - 7 Segment](#4-bit-decoder---7-segment)
+  - [8-Bit Decoder - 7 Segment](#8-bit-decoder---7-segment)
+  - [8-Bit Reverser](#8-bit-reverser)
+  - [SRAM](#sram)
+    - [16-Byte SRAM](#16-byte-sram)
+    - [256-Byte SRAM](#256-byte-sram)
+  - [Program Loader](#program-loader)
+  - [8-Bit Processor](#8-bit-processor)
+- [Compiler](#compiler)
+- [Emulator](#emulator)
+
 ## References
 * https://schweigi.github.io/assembler-simulator/
 * https://schweigi.github.io/assembler-simulator/instruction-set.html
 * https://users.informatik.haw-hamburg.de/~krabat/FH-Labor/gnupro/5_GNUPro_Utilities/c_Using_LD/ldLinker_scripts.html#example
 * https://github.com/leonicolas/computer-8bits
+* https://www.daniellowengrub.com/blog/2021/02/08/binary-counter
 
-## Instruction set (CISC)
+## TODO
+
+## Instruction set
+The instruction set implemented in this project is CISC (Complex Instruction Set Computers) based.
+
 ### Instructions
 |Instruction | OpCode | Description |
 |:-----------|:-------|:------------|
@@ -109,9 +182,9 @@
 
 ### Instruction microcode decriptions
 
-* Control Flags is a bit mapping of each microword
-* OpCode in column 2 is the assembly opcode value
-* opCode in secnd to last column is the microcode opcode value.
+* Control Flags is a bit mapping of each microword.
+* OpCode in column 2 is the assembly opcode value.
+* OpCode in second to last column is the microcode opcode value.
 
 | Instruction | OpCode |CF |ZF |VF |NF |Step  |FI |HL |AI |AO |SEL  |EO |CI |BI |BO |MI |RW |RR |II |IR |CE |CO |JP |OI |OpCode  |Control Flags  |
 |:------------|:------:|:-:|:-:|:-:|:-:|:----:|:-:|:-:|:-:|:-:|:---:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:------:|:-------------:|
@@ -180,6 +253,8 @@
 |RST          |11111   |   |   |   |   |TODO  |   |   |   |   |     |   |   |   |   |   |   |   |   |   |   |   |   |   | 1E     | 00000         |
 
 ### Logisim Instructions Testing
+
+<a id="nop-hlt"></a>
 #### NOP & HLT
 ```nasm
 00:  NOP # No operation
@@ -192,7 +267,7 @@ v2.0 raw
 ```
 ![NOP and HLT test](/Images/Test_NOP_HLT.gif)
 
-#### LDA [NUM]
+#### LDA NUM
 ```nasm
 00:  LDA 0x55 # Load A register with value 0x55
 02:  HLT # Halt the clock
@@ -675,8 +750,7 @@ void multiply(uint8_t *result, uint8_t *multiplicand, uint8_t *multiplier) {
   return;
 }
 
-int main()
-{
+int main(void) {
   uint8_t result = 0, multiplicand = 4, multiplier = 5;
   multiply(&result, &multiplicand, &multiplier);
 }
@@ -716,10 +790,10 @@ END:
 ```
 ![Multiplication test](/Images/Test_Multiplication.gif)
 
-## CPU DESIGN
+## CPU Design
 
-## Registers
-### D-Flip Flop
+### Register
+#### D-Flip Flop
 <p align="center" width="100%">
   <img src="/Images/D-FlipFlop.png" alt="D-FLip Flop with set and reset"/>
 </p>
@@ -755,10 +829,14 @@ Truth Table
 |1      |1  |0  |0  |1  |0   |
 |1      |X  |1  |1  |1  |ERR |
 
-### 1-Bit register
-![1-Bit register](/Images/1-BitRegister.png)
+#### 1-Bit register
+<p align="center" width="100%">
+  <img src="/Images/1-BitRegister.png" alt="1-Bit register"/>
+</p>
 
-![1-Bit register](/Images/1-BitRegister.gif)
+<p align="center" width="100%">
+  <img src="/Images/1-BitRegister.gif" alt="1-Bit register"/>
+</p>
 
 The 1-Bit register is made up of 1 D-Flip Flop. There is extra logic that will load the output (Q) back into the input (D) when a clock pulse comes in. This is to keep the same value latched each pulse of the clock if the load pin is not active.
 
@@ -773,13 +851,17 @@ Outputs
 - **Q** - Latched data
 - **Q'** - Inverse of latched data
 
-### 4-Bit register
+#### 4-Bit register
 Identical to the 8-Bit register but with 4 input and output pins instead of 8
 
-### 8-Bit register
-![8-Bit register](/Images/8-BitRegister.png)
+#### 8-Bit register
+<p align="center" width="100%">
+  <img src="/Images/1-BitRegister.png" alt="8-Bit register"/>
+</p>
 
-![8-Bit regsiter](/Images/8-BitRegister.gif)
+<p align="center" width="100%">
+  <img src="/Images/1-BitRegister.gif" alt="8-Bit register"/>
+</p>
 
 The 8-Bit register is made up of 8 1-Bit registers. There is an aditional enable pin used to enable the output pins Q1:Q7. Q'1:Q'7 are not currently routed to output pins.
 
@@ -796,14 +878,11 @@ Outputs
 - **Q1:Q7** - Latched data
 - **Q'1:Q'7** - Inverse of latched data (Not routed to output pins)
 
-
-Available registers in this project.
+#### Available registers in this project
 
 - Program counter register (PC)
   - The program counter is a register that contains the address
   of the instruction being executed at the current time. As each instruction gets fetched, the program counter increases its stored value by 1. After each instruction is fetched, the program counter points to the next instruction in the sequence. The program counter register is built using 8 J-K Flip Flops linked together.
-
-  https://www.daniellowengrub.com/blog/2021/02/08/binary-counter
 
   ![8-Bit counter reference](/Images/8-BitCounter.png)
 
@@ -840,6 +919,33 @@ Available registers in this project.
   - ![Flags Register](/Images/FlagsRegister.png)
   - Contains the ALU status flags Z(Zero), V(overflow), N(negative), C(carry)
 
+### Half Adder
+### Full Adder
+### 8-Bit Adder
+### D-Latch
+### 4-Bit Binary Decoder
+### Multiplexer
+#### 1-Bit Multiplexer
+#### 8-Bit Multiplexer
+#### 8-Bit 2x1 Multiplexer
+#### 8-Bit 4x1 Multiplexer
+### 8-Bit Clear
+### 8-Bit Inverter
+### 8-Bit OR
+### 8-Bit AND
+### 8-Bit XOR
+### 8-Bit ALU
+### 4-Bit Decoder - 7 Segment 
+### 8-Bit Decoder - 7 Segment
+### 8-Bit Reverser
+### SRAM
+#### 16-Byte SRAM
+#### 256-Byte SRAM
+### Program Loader
+### 8-Bit Processor
+
+## Compiler
+TODO
 
 # TODO
 Example asm program
