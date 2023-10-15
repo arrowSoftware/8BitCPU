@@ -106,7 +106,12 @@
 * OR = OUTPUT REGISTER
   * OI = Enable output register load.
     * Loads the output register with the value currently on the data bus.
+
 ### Instruction microcode decriptions
+
+* Control Flags is a bit mapping of each microword
+* OpCode in column 2 is the assembly opcode value
+* opCode in secnd to last column is the microcode opcode value.
 
 | Instruction | OpCode |CF |ZF |VF |NF |Step  |FI |HL |AI |AO |SEL  |EO |CI |BI |BO |MI |RW |RR |II |IR |CE |CO |JP |OI |OpCode  |Control Flags  |
 |:------------|:------:|:-:|:-:|:-:|:-:|:----:|:-:|:-:|:-:|:-:|:---:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:------:|:-------------:|
@@ -166,7 +171,7 @@
 |JPZ [ADDR]   |11001   | X | 0 | X | X |2     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 19     | 00008         |
 |JPZ [ADDR]   |11001   | X | 1 | X | X |2     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 19     | 0010C         |
 |             |        | X | 1 | X | X |3     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 19     | 00042         |
-|JPZ [ADDR]   |11001   | 0 | X | X | X |2     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1A     | 00008         |
+|JPC [ADDR]   |11001   | 0 | X | X | X |2     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1A     | 00008         |
 |JPC [ADDR]   |11010   | 1 | X | X | X |2     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 1A     | 0010C         |
 |             |11011   | 1 | X | X | X |3     | 0 | 0 | 0 | 0 | 000 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | 0 | 1A     | 00042         |
 |UNUSED       |11100   |   |   |   |   |      |   |   |   |   |     |   |   |   |   |   |   |   |   |   |   |   |   |   | 1B     | 00000         |
@@ -346,13 +351,76 @@ v2.0 raw
 ![SUB ADDR test](/Images/Test_SUB_ADDR.gif)
 
 #### AND NUM
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![AND NUM test](/Images/Test_AND_NUM.gif)
+
 #### AND [ADDR]
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![AND [ADDR] test](/Images/Test_AND_ADDR.gif)
+
 #### OR NUM
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![OR NUM test](/Images/Test_OR_NUM.gif)
+
 #### OR [ADDR]
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![OR [ADDR] test](/Images/Test_OR_ADDR.gif)
+
 #### XOR NUM
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![XOR NUM test](/Images/Test_XOR_NUM.gif)
+
 #### XOR [ADDR]
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![XOR [ADDR] test](/Images/Test_XOR_ADDR.gif)
+
 #### NOTA
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![NOTA test](/Images/Test_NOTA.gif)
+
 #### NOT [ADDR]
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![NOT [ADDR] test](/Images/Test_NOT_ADDR.gif)
 
 #### OUTA
 ```nasm
@@ -471,6 +539,17 @@ ZF = 0
 ```
 ```nasm
 v2.0 raw
+02 04
+0a 04
+19 10
+16 ff
+01
+00 00
+00 00
+00 00
+00
+16 55
+01
 ```
 ![JPZ ZF = 0 ADDR test](/Images/Test_JPZ_ADDR_ZF0.gif)
 
@@ -530,6 +609,114 @@ v2.0 raw
 ![JPC CF = 1 ADDR test](/Images/Test_JPC_ADDR_CF1.gif)
 
 #### RST
+```nasm
+TODO
+```
+```nasm
+v2.0 raw
+```
+![RST test](/Images/Test_RST.gif)
+
+#### Fibinacci test
+```nasm
+INIT:
+00:  LDA 0X00
+02:  STA [N1]
+04:  OUT [N1]
+06:  LDA 0X01
+08:  STA [N2]
+START:
+0A  OUT [N2]
+0C  LDA [N1]
+0E  ADD [N2]
+10  STB [N1]
+12  STA [N2]
+14  JPC [INIT]
+16  JMP [START]
+# 18: [N1]
+# 19: [N2]
+```
+```nasm
+v2.0 raw
+02 00
+04 18
+17 18
+02 01
+04 19
+17 19
+03 18
+09 19
+07 18
+04 19
+1A 00
+18 0A
+```
+![Fibinacci test](/Images/Test_Fibinacci.gif)
+
+#### Multiplication test
+Reference code in C
+```C
+void multiply(uint8_t *result, uint8_t *multiplicand, uint8_t *multiplier) {
+  uint8_t temp = 0;
+  while (1) {
+    if (*multiplier == 0) {
+      break;
+    }
+    temp = *result;
+    temp = temp + *multiplicand;
+    *result = temp;
+
+    temp = *multiplier;
+    temp = temp - 1;
+    *multiplier = temp;
+  }
+
+  printf("%d\n", *result);
+  return;
+}
+
+int main()
+{
+  uint8_t result = 0, multiplicand = 4, multiplier = 5;
+  multiply(&result, &multiplicand, &multiplier);
+}
+
+```
+```nasm
+INIT:
+0x00  LDA 4
+0x02  STA [MULTIPLIER]
+0x04  OUTA
+0x05  LDA 0
+0x07  STA [RESULT]
+0x09  LDA 5
+0x0B  STA [MULTIPLICAND]
+0x0D  OUTA
+
+START:
+0x0E  JPZ [END]
+
+0x10  LDA [RESULT]
+0x12  ADD [MULTIPLICAND]
+0x14  STA [RESULT]
+
+0x16  LDA [MULTIPLIER]
+0x18  SUB 1
+0x1C  STA [MULTIPLIER]
+
+0x1E  JP  [START]
+
+END:
+0x20  OUT [RESULT]
+0x22  HALT
+
+# 0x23  MULTIPLIER
+# 0x24  MULTIPLICAND
+# 0X25  RESULT
+```
+![Multiplication test](/Images/Test_Multiplication.gif)
+
+## CPU DESIGN
 
 ## Registers
 ### D-Flip Flop
