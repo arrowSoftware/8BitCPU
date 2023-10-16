@@ -76,6 +76,7 @@
 * https://github.com/leonicolas/computer-8bits
 * https://www.daniellowengrub.com/blog/2021/02/08/binary-counter
 * https://github.com/hlorenzi/customasm
+* https://cs.lmu.edu/~ray/notes/nasmtutorial/
 
 ## TODO
 
@@ -507,7 +508,7 @@ v2.0 raw
 ```nasm
 v2.0 raw
 02 55
-14 
+14
 01
 ```
 ![OUTA test](/Images/Test_OUTA.gif)
@@ -651,7 +652,7 @@ v2.0 raw
 00 00
 00 00
 00 00
-00 
+00
 16 55
 01
 ```
@@ -678,7 +679,7 @@ v2.0 raw
 00 00
 00 00
 00 00
-00 
+00
 16 55
 01
 ```
@@ -936,7 +937,7 @@ Outputs
 ### 8-Bit AND
 ### 8-Bit XOR
 ### 8-Bit ALU
-### 4-Bit Decoder - 7 Segment 
+### 4-Bit Decoder - 7 Segment
 ### 8-Bit Decoder - 7 Segment
 ### 8-Bit Reverser
 ### SRAM
