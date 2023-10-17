@@ -1,26 +1,14 @@
 #include <fstream>
-#include <sstream>
-#include <string>
 #include <map>
-#include <vector>
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 
-#include "Instructions.h"
+#include "Assembler.h"
 
-typedef struct CodeLine {
-    Instructions_t instruction;
-    std::string rawArgument;
-    int convertedArgument;
-    std::string code;
-    int address;
-} CodeLine_t;
+// TODO allow upper and lower case instructions
 
-typedef struct CodeLabel {
-    std::string name;
-    int lineNumber;
-    int address;
-} CodeLabel_t;
+std::vector<CodeLabel_t> labels;
 
 std::string trim(const std::string& str,
                  const std::string& whitespace = " \t")
@@ -58,141 +46,156 @@ std::string reduce(const std::string& str,
     return result;
 }
 
-bool isOneByteInstruction(std::string instruction) {
-    if (instruction == "NOP" || instruction == "HLT" || instruction == "OUTA" || instruction == "OUTB") {
-        return true;
+int parseNumber(std::string number) {
+    if (number.substr(0,2) == "0x") {
+        return std::stoi(number.substr(2, number.length()), nullptr, 16);
+    } else if (number.substr(0, 2) == "0o") {
+        return std::stoi(number.substr(2, number.length()), nullptr, 8);
+    } else if (number[number.length()-1] == 'd') {
+        return std::stoi(number.substr(0, number.length()-1), nullptr, 10);
+    } else if (number[number.length()-1] == 'b') {
+        return std::stoi(number.substr(0, number.length()-1), nullptr, 2);
+    } else {
+        return std::stoi(number, nullptr, 10);
     }
-    return false;
+
+    return -1;
 }
 
-int main(int argc, char **argv) {
-    printf("Assembling %s\n", argv[1]);
-    std::ifstream asmfile(argv[1]);
-    std::string line;
-    int lineNumber = 0;
-    int currentAddress = 0;
-    std::vector<CodeLabel_t> labels;
-    std::vector<CodeLine_t> code;
-    std::vector<CodeLine_t> compiled;
+void outputCompiledCode(std::vector<CompiledLine_t> compiledCode) {
+    std::ofstream hexFile("a.hex");
+    std::ofstream binFile("a.bin",  std::ios::out | std::ios::binary);
+    hexFile << "v2.0 raw" << std::endl;
 
+    for (int i = 0; i < compiledCode.size(); i++) {
+        std::cout << std::right << std::setw(3) << std::setfill(' ') << std::uppercase << std::hex << compiledCode.at(i).address << ":" << std::setw(6) << " ";
+
+        if (compiledCode.at(i).instruction != DB) {
+            std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << compiledCode.at(i).instruction << " ";
+            hexFile << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << compiledCode.at(i).instruction << " ";
+            binFile << static_cast<unsigned char>(compiledCode.at(i).instruction & 0xFF);
+        }
+
+        if (compiledCode.at(i).rawOperand != "") {
+            std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << compiledCode.at(i).operand << " "  << std::setfill(' ') << std::setw(6) << " ";
+            hexFile << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << compiledCode.at(i).operand << std::endl;
+            binFile << static_cast<unsigned char>(compiledCode.at(i).operand & 0xFF);
+
+            if (compiledCode.at(i).instruction == DB) {
+                std::cout << "   ";
+            }
+        } else {
+            std::cout << std::setfill(' ') << std::setw(9) << " ";
+        }
+
+        std::cout << compiledCode.at(i).rawCode << std::endl;
+    }
+}
+
+std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
+    std::string line;
+    std::vector<CodeLine_t> rawCode;
+    int lineNumber = 1;
+    std::vector<CompiledLine_t> compiledLine;
+    labels.clear();
+
+    // Read entire file into memory
     while (std::getline(asmfile, line)) {
         if (line != "") {
-            std::string reduced = reduce(line);
-            code.push_back({NOP, "", 0, reduced, currentAddress});
-            if (reduced.find(":") != std::string::npos) {
-                labels.push_back({reduced.substr(0, reduced.find(':')), lineNumber, 0});
-            }
-            printf("[*] %02X: %s\n", lineNumber, line.c_str());
-            lineNumber++;
-        }
-    }
-
-    std::vector<CodeLabel_t>::iterator label_it = labels.begin();
-    while (label_it != labels.end())
-    {
-        printf("[*] Label @ %02X: %s\n", label_it->lineNumber, label_it->name.c_str());
-        ++label_it;
-    }
-
-    std::vector<CodeLine_t>::iterator it = code.begin();
-    while (it != code.end()) {
-        std::string line = it->code;
-        std::vector<std::string> tokens;
-        std::istringstream iss(line);
-        std::string temp;
-
-        while (std::getline(iss, temp, ' ')) {
-            tokens.push_back(temp);
+            rawCode.push_back({lineNumber, reduce(line), {}});
         }
 
-        std::string instruction = tokens.at(0);
-        std::string argument;
+        lineNumber++;
+    }
 
-        if ((instruction == "LDA") ||
-            (instruction == "STA") ||
-            (instruction == "OUT") ||
-            (instruction == "ADD") ||
-            (instruction == "STB") ||
-            (instruction == "STA") ||
-            (instruction == "JMP") ||
-            (instruction == "JPC") ||
-            (instruction == "JPZ")) {
+    std::vector<CodeLine_t>::iterator it = rawCode.begin();
+    std::string temp;
+    int currentAddress = 0;
 
-            argument = tokens.at(1);
-            it->rawArgument = argument;
-            it->address = currentAddress;
+    // tokenize each line of code.
+    while (it != rawCode.end()) {
+        std::stringstream ss(it->line);
+        while(std::getline(ss, temp, ' ')) {
+            if (temp.find(";") == std::string::npos) {
+                it->tokens.push_back(temp);
+            }
+        }
 
-            if (argument.find('[') != std::string::npos) {
-                it->instruction = getInstructionEnum(instruction, true);
-            } else {
-                it->instruction = getInstructionEnum(instruction, false);
+        for (int i = 0; i < it->tokens.size(); i++) {
+            // Gather the labels.
+            if (it->tokens.at(i).find(":") != std::string::npos) {
+                labels.push_back({it->lineNumber, currentAddress, it->tokens.at(i).substr(0, it->tokens.at(i).find(":"))});
             }
 
-            compiled.push_back({it->instruction, it->rawArgument, 0, line, it->address});
-            currentAddress += getInstructionSize(it->instruction);
-        } else if ((instruction == "HLT") || (instruction == "OUTA") || (instruction == "OUTB")) {
-            it->instruction = getInstructionEnum(instruction, false);
-            it->rawArgument = argument;
-            it->address = currentAddress;
-            compiled.push_back({it->instruction, it->rawArgument, 0, line, it->address});
-            currentAddress += getInstructionSize(it->instruction);
-        } else if (instruction.find(":") && tokens.size() > 1) {
-            if (tokens.at(1) == "DB") {
-                for (std::vector<CodeLabel_t>::iterator iter = labels.begin(); iter != labels.end(); ++iter) {
-                    if (instruction.substr(0, instruction.find(":")) == iter->name) {
-                        iter->address = currentAddress;
-                        compiled.push_back({DB, tokens.at(2), std::stoi(tokens.at(2)), line, iter->address});
-                        break;
+            if ((it->tokens.at(i) == "LDA") || (it->tokens.at(i) == "STA") ||
+                (it->tokens.at(i) == "LDB") || (it->tokens.at(i) == "STB") ||
+                (it->tokens.at(i) == "STB") || (it->tokens.at(i) == "ADD") ||
+                (it->tokens.at(i) == "SUB") || (it->tokens.at(i) == "OUT") ||
+                (it->tokens.at(i) == "JMP") || (it->tokens.at(i) == "JPZ") ||
+                (it->tokens.at(i) == "JPC")) {
+
+                if (it->tokens.size() < i+2) {
+                    std::cout << "Error: Line " << it->lineNumber << " Operand missing - " << it->line << std::endl;
+                    return {};
+                } else {
+                    std::string operand = it->tokens.at(i+1);
+                    if (operand.find("[") != std::string::npos) {
+                        compiledLine.push_back({currentAddress, getInstructionEnum(it->tokens.at(i), true), operand, 0, it->line, it->lineNumber});
+                    } else {
+                        int number = parseNumber(operand);
+                        if (number == -1) {
+                            std::cout << "Error: Line " << it->lineNumber << " Invalid number format - " << it->line << std::endl;
+                            return {};
+                        } else if (number > 255) {
+                            std::cout << "Error: Line " << it->lineNumber << " Number '"<< number << "' exceeds 8 bit max 255 - " << it->line << std::endl;
+                            return {};
+                        }
+                        compiledLine.push_back({currentAddress, getInstructionEnum(it->tokens.at(i), false), operand, parseNumber(operand), it->line, it->lineNumber});
                     }
+                    currentAddress += getInstructionSize(getInstructionEnum(it->tokens.at(i), true));
+                }
+            } else if ((it->tokens.at(i) == "HLT") || (it->tokens.at(i) == "OUTA") || (it->tokens.at(i) == "OUTB") || (it->tokens.at(i) == "NOP")) {
+                if (it->tokens.size() > i+1) {
+                    std::cout << "Error: Line " << it->lineNumber << " Instruction " << it->tokens.at(i) << " does not support operands - " << it->line << std::endl;
+                    return {};
+                }
+                compiledLine.push_back({currentAddress, getInstructionEnum(it->tokens.at(i), false), "", 0, it->line, it->lineNumber});
+                currentAddress += getInstructionSize(getInstructionEnum(it->tokens.at(i), false));
+            } else if (it->tokens.at(i) == "DB") {
+                if (it->tokens.size() < i+2) {
+                    std::cout << "Error: Line " << it->lineNumber << " Missing variable initializer - " << it->line << std::endl;
+                    return {};
                 }
 
+                compiledLine.push_back({currentAddress, DB, it->tokens.at(i+1), std::stoi(it->tokens.at(i+1)), it->line, it->lineNumber});
                 currentAddress++;
             }
-        } else if (instruction.find(":") && tokens.size() == 1) {
-            for (std::vector<CodeLabel_t>::iterator iter = labels.begin(); iter != labels.end(); ++iter) {
-                if (instruction.substr(0, instruction.find(":")) == iter->name) {
-                    iter->address = currentAddress;
-                    compiled.push_back({LABEL, "", 0, line, iter->address});
-                    break;
-                }
-            }
         }
 
         ++it;
     }
 
-    std::ofstream datafile("a.hex");
-    datafile << "v2.0 raw" << std::endl;
+    for (int i = 0; i < compiledLine.size(); i++) {
+        for (int j = 0; j < labels.size(); j++) {
+            if (compiledLine.at(i).rawOperand.find("[") != std::string::npos) {
+                if (compiledLine.at(i).rawOperand.find(labels.at(j).name) != std::string::npos) {
+                    compiledLine.at(i).operand = labels.at(j).address;
+                    break;
+                }
 
-    it = compiled.begin();
-    while (it != compiled.end()) {
-        if (it->instruction == LABEL) {
-        } else if (it->instruction == DB) {
-            std::cout << std::right << std::setw(3) << std::setfill(' ') << std::uppercase << std::hex << it->address << ":" << std::setw(6) << " ";
-            std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << it->convertedArgument << " "  << std::setfill(' ') << std::setw(9) << " ";
-            std::cout << it->code << std::endl;
-
-            datafile << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << it->convertedArgument << std::endl;
-        } else {
-            for (std::vector<CodeLabel_t>::iterator iter = labels.begin(); iter != labels.end(); ++iter) {
-                if (it->rawArgument.find("[") != std::string::npos) {
-                    if (iter->name == it->rawArgument.substr(it->rawArgument.find("[")+1, it->rawArgument.find(']')-1)) {
-                        it->convertedArgument = iter->address;
-                        break;
-                    }
+                // No labels found.
+                if (j == labels.size() - 1) {
+                    std::cout << "Error: Line " << compiledLine.at(i).lineNumber << " undefined reference to '" << compiledLine.at(i).rawOperand << "'" << std::endl;
+                    return {};
                 }
             }
-
-            std::cout << std::right << std::setw(3) << std::setfill(' ') << std::uppercase << std::hex << it->address << ":" << std::setw(6) << " ";
-            std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << it->instruction << " ";
-            std::cout << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << it->convertedArgument << " "  << std::setfill(' ') << std::setw(6) << " ";
-            std::cout << it->code << std::endl;
-
-            datafile << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << it->instruction << " ";
-            datafile << std::setw(2) << std::setfill('0') << std::uppercase << std::hex << it->convertedArgument << std::endl;
-         }
-        ++it;
+        }
     }
-
-    return 0;
+    return compiledLine;
 }
+
+//int main(int argc, char **argv) {
+//    std::ifstream inputFile(argv[1]);
+//    printf("Assembling %s\n", argv[1]);
+//    outputCompiledCode(assemble(inputFile));
+//}

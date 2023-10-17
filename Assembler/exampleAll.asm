@@ -1,0 +1,3 @@
+LDA 05
+LDA 0x0A
+LDA 21
