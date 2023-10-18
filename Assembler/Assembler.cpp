@@ -4,64 +4,11 @@
 #include <iomanip>
 #include <iterator>
 #include <algorithm>
-#include <cctype>
 
 #include "Assembler.h"
 #include "Helpers.h"
 
 std::vector<CodeLabel_t> labels;
-
-std::string trim(const std::string& str,
-                 const std::string& whitespace = " \t")
-{
-    const auto strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == std::string::npos)
-        return ""; // no content
-
-    const auto strEnd = str.find_last_not_of(whitespace);
-    const auto strRange = strEnd - strBegin + 1;
-
-    return str.substr(strBegin, strRange);
-}
-
-std::string reduce(const std::string& str,
-                   const std::string& fill = " ",
-                   const std::string& whitespace = " \t")
-{
-    // trim first
-    auto result = trim(str, whitespace);
-
-    // replace sub ranges
-    auto beginSpace = result.find_first_of(whitespace);
-    while (beginSpace != std::string::npos)
-    {
-        const auto endSpace = result.find_first_not_of(whitespace, beginSpace);
-        const auto range = endSpace - beginSpace;
-
-        result.replace(beginSpace, range, fill);
-
-        const auto newStart = beginSpace + fill.length();
-        beginSpace = result.find_first_of(whitespace, newStart);
-    }
-
-    return result;
-}
-
-int parseNumber(std::string number) {
-    if (number.substr(0,2) == "0x") {
-        return std::stoi(number.substr(2, number.length()), nullptr, 16);
-    } else if (number.substr(0, 2) == "0o") {
-        return std::stoi(number.substr(2, number.length()), nullptr, 8);
-    } else if (number[number.length()-1] == 'd') {
-        return std::stoi(number.substr(0, number.length()-1), nullptr, 10);
-    } else if (number[number.length()-1] == 'b') {
-        return std::stoi(number.substr(0, number.length()-1), nullptr, 2);
-    } else {
-        return std::stoi(number, nullptr, 10);
-    }
-
-    return -1;
-}
 
 void outputCompiledCode(std::vector<CompiledLine_t> compiledCode) {
     std::ofstream hexFile("a.hex");
@@ -134,7 +81,13 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
                     std::cout << "Error: line " << it->lineNumber << " Syntax error too many ':' in label - " << it->line << std::endl;
                     return {};
                 }
-                labels.push_back({it->lineNumber, currentAddress, it->tokens.at(i).substr(0, it->tokens.at(i).find(":"))});
+                std::string strippedLabel = it->tokens.at(i).substr(0, it->tokens.at(i).find(":"));
+                std::vector<CodeLabel_t>::iterator dupeIt = std::find_if(labels.begin(), labels.end(), find_name(strippedLabel));
+                if (dupeIt != labels.end()) {
+                    std::cout << "Error: Line " << it->lineNumber << " duplicate label found '" << labels.at(i).name << "' first referenced on line " << dupeIt->lineNumber << std::endl;
+                    return {};
+                }
+                labels.push_back({it->lineNumber, currentAddress, strippedLabel});
             }
 
             if ((isEqual(it->tokens.at(i), "LDA")) || (isEqual(it->tokens.at(i), "STA")) ||
@@ -164,7 +117,7 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
                     }
                     currentAddress += getInstructionSize(getInstructionEnum(it->tokens.at(i), true));
                 }
-            } else if ((isEqual(it->tokens.at(i), "HLT")) || (isEqual(it->tokens.at(i), "OUTA")) || 
+            } else if ((isEqual(it->tokens.at(i), "HLT")) || (isEqual(it->tokens.at(i), "OUTA")) ||
                        (isEqual(it->tokens.at(i), "OUTB")) || (isEqual(it->tokens.at(i), "NOP"))) {
 
                 if (it->tokens.size() > i+1) {
@@ -213,9 +166,3 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
 
     return compiledLine;
 }
-
-//int main(int argc, char **argv) {
-//    std::ifstream inputFile(argv[1]);
-//    printf("Assembling %s\n", argv[1]);
-//    outputCompiledCode(assemble(inputFile));
-//}

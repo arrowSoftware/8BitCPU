@@ -1,10 +1,14 @@
 #include "Assembler.h"
+
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <algorithm>
 
 #include <stdio.h>
 #include <gtest/gtest.h>
+
 
 TEST(TestNOP, NOP_Valid) {
     std::stringstream testData;
@@ -142,6 +146,27 @@ TEST(TestLDA_NUM, LDA_binary) {
     ASSERT_EQ(2, compiledCode.at(0).instruction);
     ASSERT_EQ(3, compiledCode.at(0).operand);
     ASSERT_EQ("LDA 011b", compiledCode.at(0).rawCode);
+}
+
+TEST(TestLDA_NUM, LDA_NumTooLarge) {
+    std::stringstream testData;
+    testData << "LDA 300" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLDA_NUM, LDA_MissingOperand) {
+    std::stringstream testData;
+    testData << "LDA " << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLDA_NUM, LDA_InvalidNumberFormat) {
+    std::stringstream testData;
+    testData << "LDA s43" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
 }
 
 TEST(TestLDA_ADDR, LDA_ValidAddr) {
@@ -746,6 +771,61 @@ TEST(TestOUTB, OUTB_Invalid_operand2) {
     ASSERT_EQ(0, compiledCode.size());
 }
 
+TEST(TestOUT_NUM, OUT_ignoreCase) {
+    std::stringstream testData;
+    testData << "out 200" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x16, compiledCode.at(0).instruction);
+    ASSERT_EQ(200, compiledCode.at(0).operand);
+    ASSERT_EQ("out 200", compiledCode.at(0).rawCode);
+}
+
+TEST(TestOUT_NUM, OUT_Hex) {
+    std::stringstream testData;
+    testData << "OUT 0xCD" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x16, compiledCode.at(0).instruction);
+    ASSERT_EQ(0xCD, compiledCode.at(0).operand);
+    ASSERT_EQ("OUT 0xCD", compiledCode.at(0).rawCode);
+}
+
+TEST(TestOUT_NUM, OUT_Octal) {
+    std::stringstream testData;
+    testData << "OUT 0o20" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x16, compiledCode.at(0).instruction);
+    ASSERT_EQ(16, compiledCode.at(0).operand);
+    ASSERT_EQ("OUT 0o20", compiledCode.at(0).rawCode);
+}
+
+TEST(TestOUT_NUM, OUT_explicitDecimal) {
+    std::stringstream testData;
+    testData << "OUT 150d" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x16, compiledCode.at(0).instruction);
+    ASSERT_EQ(150, compiledCode.at(0).operand);
+    ASSERT_EQ("OUT 150d", compiledCode.at(0).rawCode);
+}
+
+TEST(TestOUT_NUM, OUT_binary) {
+    std::stringstream testData;
+    testData << "OUT 011b" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x16, compiledCode.at(0).instruction);
+    ASSERT_EQ(3, compiledCode.at(0).operand);
+    ASSERT_EQ("OUT 011b", compiledCode.at(0).rawCode);
+}
+
 TEST(TestOUT_ADDR, OUT_ValidAddr) {
     std::stringstream testData;
     testData << "OUT [variable]" << std::endl;
@@ -923,7 +1003,30 @@ TEST(TestRST, RST_Invalid_operand2) {
 }
 
 TEST(TestDB, DB_Valid) {
-    GTEST_SKIP() << "Needs implementation";
+    std::stringstream testData;
+    testData << "INIT: ; Initialize state" << std::endl
+             << "variable: DB 0x00" << std::endl
+             << "variable2: db 110" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(2, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(1, compiledCode.at(1).address);
+}
+
+TEST(TestDB, DB_duplicates) {
+    std::stringstream testData;
+    testData << "INIT: ; Initialize state" << std::endl
+             << "variable: DB 0x00" << std::endl
+             << "variable: DB 110b" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestDB, DB_missingInitializer) {
+    std::stringstream testData;
+    testData << "variable: DB " << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
 }
 
 TEST(TestComments, Comments_Valid) {
@@ -993,6 +1096,24 @@ TEST(TestLabels, BadFormatLabel) {
              << "mis:pell: DB 0" << std::endl;
     std::vector<CompiledLine_t> compiledCode = assemble(testData);
     ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLabels, NonStandardLabelFormat) {
+    std::stringstream testData;
+    testData << "INIT: LDA [variable]" << std::endl
+             << "variable:" << std::endl
+             << "    DB 0" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(2, compiledCode.size());
+
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(3, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("INIT: LDA [variable]", compiledCode.at(0).rawCode);
+
+    ASSERT_EQ(2, compiledCode.at(1).address);
+    ASSERT_EQ(0, compiledCode.at(1).operand);
+    ASSERT_EQ("DB 0", compiledCode.at(1).rawCode);
 }
 
 TEST(TestCombinations, TestCombination1) {
@@ -1112,6 +1233,110 @@ TEST(TestCombinations, TestCombination2) {
     ASSERT_EQ(24, compiledCode.at(12).address);
     ASSERT_EQ(1, compiledCode.at(12).instruction);
     ASSERT_EQ("HLT", compiledCode.at(12).rawCode);
+}
+
+TEST(TestOutput, outputHex) {
+    std::stringstream testData;
+    testData << "INIT:" << std::endl
+             << "    LDA 00" << std::endl
+             << "    STA [N1]" << std::endl
+             << "    OUT [N1]" << std::endl
+             << "    LDA 01" << std::endl
+             << "    STA [N2]" << std::endl
+             << " " << std::endl
+             << "START:" << std::endl
+             << "    OUT [N2]" << std::endl
+             << "    LDA [N1]" << std::endl
+             << "    ADD [N2]" << std::endl
+             << "    STB [N1]" << std::endl
+             << "    STA [N2]" << std::endl
+             << "    JPC [INIT]" << std::endl
+             << "    JMP [START]" << std::endl
+             << "END:" << std::endl
+             << "    HLT" << std::endl
+             << " " << std::endl
+             << "N1: DB 00" << std::endl
+             << "N2: DB 00" << std::endl;
+
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    outputCompiledCode(compiledCode);
+    std::ifstream inputFile("a.hex");
+    std::string line;
+    std::vector<std::string> expectedLines = {
+        "v2.0 raw",
+        "02 00",
+        "04 19",
+        "17 19",
+        "02 01",
+        "04 1A",
+        "17 1A",
+        "03 19",
+        "09 1A",
+        "07 19",
+        "04 1A",
+        "1A 00",
+        "18 0A",
+        "01 00",
+        "00"
+    };
+    int i = 0;
+    ASSERT_TRUE(inputFile.is_open());
+    int lineCount = std::count(std::istreambuf_iterator<char>(inputFile), std::istreambuf_iterator<char>(), '\n');
+    inputFile.seekg(0, std::ios_base::beg);
+    ASSERT_EQ(expectedLines.size(), lineCount);
+    for (int i = 0; i < expectedLines.size(); i++) {
+        std::getline(inputFile, line);
+        ASSERT_EQ(expectedLines.at(i), line);
+    }
+}
+
+TEST(TestOutput, outputBin) {
+    std::stringstream testData;
+    testData << "INIT:" << std::endl
+             << "    LDA 00" << std::endl
+             << "    STA [N1]" << std::endl
+             << "    OUT [N1]" << std::endl
+             << "    LDA 01" << std::endl
+             << "    STA [N2]" << std::endl
+             << " " << std::endl
+             << "START:" << std::endl
+             << "    OUT [N2]" << std::endl
+             << "    LDA [N1]" << std::endl
+             << "    ADD [N2]" << std::endl
+             << "    STB [N1]" << std::endl
+             << "    STA [N2]" << std::endl
+             << "    JPC [INIT]" << std::endl
+             << "    JMP [START]" << std::endl
+             << "END:" << std::endl
+             << "    HLT" << std::endl
+             << " " << std::endl
+             << "N1: DB 00" << std::endl
+             << "N2: DB 00" << std::endl;
+
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    outputCompiledCode(compiledCode);
+    std::ifstream inputFile("a.bin", std::ios::in | std::ios::binary);
+    std::vector<uint8_t> contents;
+
+    inputFile.unsetf(std::ios::skipws);
+    inputFile.seekg(0, std::ios_base::end);
+    size_t fileSize = inputFile.tellg();
+    inputFile.seekg(0, std::ios_base::beg);
+    contents.resize(0);
+    contents.reserve(0);
+    contents.shrink_to_fit();
+    contents.reserve(fileSize);
+    contents.insert(contents.begin(), std::istream_iterator<uint8_t>(inputFile), std::istream_iterator<uint8_t>());
+    std::vector<uint8_t> expectedData = {
+        0x02,0x00,0x04,0x19,0x17,0x19,0x02,0x01,0x04,0x1A,
+        0x17,0x1A,0x03,0x19,0x09,0x1A,0x07,0x19,0x04,0x1A,
+        0x1A,0x00,0x18, 0x0A,0x01,0x00,0x00
+    };
+
+    ASSERT_EQ(expectedData.size(), contents.size());
+    for (int i = 0; i < expectedData.size(); i++) {
+        ASSERT_EQ(expectedData.at(i), contents.at(i));
+    }
 }
 
 int main(int argc, char **argv) {

@@ -29,6 +29,14 @@ typedef struct CodeLabel {
     int referenceCount;
 } CodeLabel_t;
 
+struct find_name {
+    std::string name;
+    find_name(std::string name) : name(name) {}
+    bool operator()(CodeLabel_t const &c) const {
+        return c.name == name;
+    }
+};
+
 std::vector<CompiledLine_t> assemble(std::istream &asmfile);
 void outputCompiledCode(std::vector<CompiledLine_t> compiledCode);
 

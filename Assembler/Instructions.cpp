@@ -2,12 +2,14 @@
 #include "Helpers.h"
 
 int getInstructionSize(Instructions_t instruction) {
+    int size = 0;
     for (int i = 0; i < 27; i++) {
         if (instructionDetails[i].opCode == instruction) {
-            return instructionDetails[i].size;
+            size = instructionDetails[i].size;
+            break;
         }
     }
-    return 0;
+    return size;
 }
 
 Instructions_t getInstructionEnum(std::string instruction, bool addr) {
