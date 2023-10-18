@@ -49,7 +49,6 @@ all : $(TARGET) $(TEST_TARGET)
 
 clean:
 	$(RM) $(call FixPath,*.a *.o html *.gcda *.gcdo *.gcno *.bin *.hex coverage.run $(TARGET) $(TEST_TARGET))
-	#rm -rf *.a *.o html *.gcda *.gcdo *.gcno *.bin *.hex coverage.run $(TARGET) $(TEST_TARGET)
 
 coverage:
 	./$(TEST_TARGET)
