@@ -66,7 +66,8 @@
     - [256-Byte SRAM](#256-byte-sram)
   - [Program Loader](#program-loader)
   - [8-Bit Processor](#8-bit-processor)
-- [Compiler](#compiler)
+- [Assembler](#assembler)
+- [Objdump](#objdump)
 - [Emulator](#emulator)
 
 ## References
@@ -946,10 +947,58 @@ Outputs
 ### Program Loader
 ### 8-Bit Processor
 
-## Compiler
-TODO
+## Assembler
+[Assembler source](Assembler/)
 
-# TODO
+### Example output
+```
+Assembling example.asm
+Warning: 0 references found for label 'END' on line 16
+Address   Compiled    Raw
+  0:      02 00       LDA 00
+  2:      04 19       STA [N1]
+  4:      17 19       OUT [N1]
+  6:      02 01       LDA 01
+  8:      04 1A       STA [N2]
+  A:      17 1A       OUT [N2]
+  C:      03 19       LDA [N1]
+  E:      09 1A       ADD [N2]
+ 10:      07 19       STB [N1]
+ 12:      04 1A       STA [N2]
+ 14:      1A 00       JPC [INIT]
+ 16:      18 0A       JMP [START]
+ 18:      01          HLT
+ 19:      00          N1: DB 00
+ 1A:      00          N2: DB 00
+ ```
+
+### Warnings & Errors
+```
+Error: line 1 Syntax error too many ':' in label - INI:T:
+```
+```
+Error: Line 2 duplicate label found 'variable' first referenced on line 1
+```
+```
+Error: line 1 Operand missing - LDA
+```
+```
+Error: line 1 Invalid number format - LDA a342
+```
+```
+Error: line 1 Number '300' exceeds 8 bit max 255 - LDA 300
+```
+```
+Error: line 1 Instruction HLT does not support operands - HLT 23
+```
+```
+Error: line 1 Missing variable initializer - variable DB
+```
+```
+Warning: 0 references found for label 'variable' on line 7
+```
+
+### Reference assembler outputs.
 Example asm program
 ```asm
           global    _start
@@ -1046,3 +1095,5 @@ ELF Header:
   Number of section headers:         6
   Section header string table index: 5
   ```
+## Objdump
+ TODO
