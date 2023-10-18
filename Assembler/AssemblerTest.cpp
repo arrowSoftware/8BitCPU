@@ -17,6 +17,17 @@ TEST(TestNOP, NOP_Valid) {
     ASSERT_EQ("NOP", compiledCode.at(0).rawCode);
 }
 
+TEST(TestNOP, NOP_Valid_ignoreCase) {
+    std::stringstream testData;
+    testData << "nop" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0, compiledCode.at(0).instruction);
+    ASSERT_EQ(0, compiledCode.at(0).operand);
+    ASSERT_EQ("nop", compiledCode.at(0).rawCode);
+}
+
 TEST(TestNOP, NOP_Invalid_operand1) {
     std::stringstream testData;
     testData << "NOP 0x20" << std::endl;
@@ -42,6 +53,17 @@ TEST(TestHLT, HLT_Valid) {
     ASSERT_EQ("HLT", compiledCode.at(0).rawCode);
 }
 
+TEST(TestHLT, HLT_Valid_ignoreCase) {
+    std::stringstream testData;
+    testData << "hlt" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(1, compiledCode.at(0).instruction);
+    ASSERT_EQ(0, compiledCode.at(0).operand);
+    ASSERT_EQ("hlt", compiledCode.at(0).rawCode);
+}
+
 TEST(TestHLT, HLT_Invalid_operand1) {
     std::stringstream testData;
     testData << "HLT 0x20" << std::endl;
@@ -54,6 +76,17 @@ TEST(TestHLT, HLT_Invalid_operand2) {
     testData << "HLT [address]" << std::endl;
     std::vector<CompiledLine_t> compiledCode = assemble(testData);
     ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLDA_NUM, LDA_ignoreCase) {
+    std::stringstream testData;
+    testData << "lda 200" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(2, compiledCode.at(0).instruction);
+    ASSERT_EQ(200, compiledCode.at(0).operand);
+    ASSERT_EQ("lda 200", compiledCode.at(0).rawCode);
 }
 
 TEST(TestLDA_NUM, LDA_decimal) {
@@ -151,6 +184,18 @@ TEST(TestSTA_ADDR, STA_ValidAddr) {
     ASSERT_EQ("STA [variable]", compiledCode.at(0).rawCode);
 }
 
+TEST(TestSTA_ADDR, STA_ignoreCase) {
+    std::stringstream testData;
+    testData << "sta [variable]" << std::endl;
+    testData << "variable: DB 0x10" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(4, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("sta [variable]", compiledCode.at(0).rawCode);
+}
+
 TEST(TestSTA_ADDR, STA_InvalidAddr) {
     std::stringstream testData;
     testData << "STA [unknown]" << std::endl;
@@ -176,6 +221,17 @@ TEST(TestLDB_NUM, LDB_decimal) {
     ASSERT_EQ(5, compiledCode.at(0).instruction);
     ASSERT_EQ(200, compiledCode.at(0).operand);
     ASSERT_EQ("LDB 200", compiledCode.at(0).rawCode);
+}
+
+TEST(TestLDB_NUM, LDB_ignoreCase) {
+    std::stringstream testData;
+    testData << "ldb 200" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(5, compiledCode.at(0).instruction);
+    ASSERT_EQ(200, compiledCode.at(0).operand);
+    ASSERT_EQ("ldb 200", compiledCode.at(0).rawCode);
 }
 
 TEST(TestLDB_NUM, LDB_Hex) {
@@ -262,6 +318,18 @@ TEST(TestSTB_ADDR, STB_ValidAddr) {
     ASSERT_EQ("STB [variable]", compiledCode.at(0).rawCode);
 }
 
+TEST(TestSTB_ADDR, STB_ignoreCase) {
+    std::stringstream testData;
+    testData << "stb [variable]" << std::endl;
+    testData << "variable: DB 0x10" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(7, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("stb [variable]", compiledCode.at(0).rawCode);
+}
+
 TEST(TestSTB_ADDR, STB_InvalidAddr) {
     std::stringstream testData;
     testData << "STB [unknown]" << std::endl;
@@ -287,6 +355,17 @@ TEST(TestADD_NUM, ADD_decimal) {
     ASSERT_EQ(8, compiledCode.at(0).instruction);
     ASSERT_EQ(200, compiledCode.at(0).operand);
     ASSERT_EQ("ADD 200", compiledCode.at(0).rawCode);
+}
+
+TEST(TestADD_NUM, ADD_ignoreCase) {
+    std::stringstream testData;
+    testData << "add 200" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(8, compiledCode.at(0).instruction);
+    ASSERT_EQ(200, compiledCode.at(0).operand);
+    ASSERT_EQ("add 200", compiledCode.at(0).rawCode);
 }
 
 TEST(TestADD_NUM, ADD_Hex) {
@@ -372,6 +451,17 @@ TEST(TestSUB_NUM, SUB_decimal) {
     ASSERT_EQ("SUB 200", compiledCode.at(0).rawCode);
 }
 
+TEST(TestSUB_NUM, SUB_ignoreCase) {
+    std::stringstream testData;
+    testData << "sub 200" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0xA, compiledCode.at(0).instruction);
+    ASSERT_EQ(200, compiledCode.at(0).operand);
+    ASSERT_EQ("sub 200", compiledCode.at(0).rawCode);
+}
+
 TEST(TestSUB_NUM, SUB_Hex) {
     std::stringstream testData;
     testData << "SUB 0xCD" << std::endl;
@@ -448,6 +538,10 @@ TEST(TestAND_NUM, AND_decimal) {
     GTEST_SKIP() << "Needs implementation";
 }
 
+TEST(TestAND_NUM, AND_ignoreCase) {
+    GTEST_SKIP() << "Needs implementation";
+}
+
 TEST(TestAND_NUM, AND_hex) {
     GTEST_SKIP() << "Needs implementation";
 }
@@ -480,6 +574,10 @@ TEST(TestOR_NUM, OR_decimal) {
     GTEST_SKIP() << "Needs implementation";
 }
 
+TEST(TestOR_NUM, OR_ignoreCase) {
+    GTEST_SKIP() << "Needs implementation";
+}
+
 TEST(TestOR_NUM, OR_hex) {
     GTEST_SKIP() << "Needs implementation";
 }
@@ -505,6 +603,10 @@ TEST(TestOR_ADDR, OR_InvalidAddr) {
 }
 
 TEST(TestOR_ADDR, OR_InalidDirectAddr) {
+    GTEST_SKIP() << "Needs implementation";
+}
+
+TEST(TestXOR_NUM, XOR_ignoreCase) {
     GTEST_SKIP() << "Needs implementation";
 }
 
@@ -544,6 +646,10 @@ TEST(TestNOTA, NOTA_Valid) {
     GTEST_SKIP() << "Needs implementation";
 }
 
+TEST(TestNOTA, NOTA_ignoreCase) {
+    GTEST_SKIP() << "Needs implementation";
+}
+
 TEST(TestNOTA, NOTA_Invalid_operand1) {
     GTEST_SKIP() << "Needs implementation";
 }
@@ -553,6 +659,10 @@ TEST(TestNOTA, NOTA_Invalid_operand2) {
 }
 
 TEST(TestNOT_ADDR, NOT_ValidAddr) {
+    GTEST_SKIP() << "Needs implementation";
+}
+
+TEST(TestNOT_ADDR, NOTA_ignoreCase) {
     GTEST_SKIP() << "Needs implementation";
 }
 
@@ -573,6 +683,17 @@ TEST(TestOUTA, OUTA_Valid) {
     ASSERT_EQ(0x14, compiledCode.at(0).instruction);
     ASSERT_EQ(0, compiledCode.at(0).operand);
     ASSERT_EQ("OUTA", compiledCode.at(0).rawCode);
+}
+
+TEST(TestOUTA, OUTA_ignoreCase) {
+    std::stringstream testData;
+    testData << "outa" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x14, compiledCode.at(0).instruction);
+    ASSERT_EQ(0, compiledCode.at(0).operand);
+    ASSERT_EQ("outa", compiledCode.at(0).rawCode);
 }
 
 TEST(TestOUTA, OUTA_Invalid_operand1) {
@@ -600,6 +721,17 @@ TEST(TestOUTB, OUTB_Valid) {
     ASSERT_EQ("OUTB", compiledCode.at(0).rawCode);
 }
 
+TEST(TestOUTB, OUTB_ignoreCase) {
+    std::stringstream testData;
+    testData << "outb" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x15, compiledCode.at(0).instruction);
+    ASSERT_EQ(0, compiledCode.at(0).operand);
+    ASSERT_EQ("outb", compiledCode.at(0).rawCode);
+}
+
 TEST(TestOUTB, OUTB_Invalid_operand1) {
     std::stringstream testData;
     testData << "OUTB 0x20" << std::endl;
@@ -624,6 +756,18 @@ TEST(TestOUT_ADDR, OUT_ValidAddr) {
     ASSERT_EQ(0x17, compiledCode.at(0).instruction);
     ASSERT_EQ(2, compiledCode.at(0).operand);
     ASSERT_EQ("OUT [variable]", compiledCode.at(0).rawCode);
+}
+
+TEST(TestOUT_ADDR, OUT_ignoreCase) {
+    std::stringstream testData;
+    testData << "out [variable]" << std::endl;
+    testData << "variable: DB 0x10" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x17, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("out [variable]", compiledCode.at(0).rawCode);
 }
 
 TEST(TestOUT_ADDR, OUT_InvalidAddr) {
@@ -654,6 +798,18 @@ TEST(TestJMP_ADDR, JMP_ValidAddr) {
     ASSERT_EQ("JMP [variable]", compiledCode.at(0).rawCode);
 }
 
+TEST(TestJMP_ADDR, JMP_ignoreCase) {
+    std::stringstream testData;
+    testData << "jmp [variable]" << std::endl;
+    testData << "variable: DB 0x10" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x18, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("jmp [variable]", compiledCode.at(0).rawCode);
+}
+
 TEST(TestJMP_ADDR, JMP_InvalidAddr) {
     std::stringstream testData;
     testData << "JMP [unknown]" << std::endl;
@@ -680,6 +836,18 @@ TEST(TestJPZ_ADDR, JPZ_ValidAddr) {
     ASSERT_EQ(0x19, compiledCode.at(0).instruction);
     ASSERT_EQ(2, compiledCode.at(0).operand);
     ASSERT_EQ("JPZ [variable]", compiledCode.at(0).rawCode);
+}
+
+TEST(TestJPZ_ADDR, JPZ_ignoreCase) {
+    std::stringstream testData;
+    testData << "jpz [variable]" << std::endl;
+    testData << "variable: DB 0x10" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x19, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("jpz [variable]", compiledCode.at(0).rawCode);
 }
 
 TEST(TestJPZ_ADDR, JPZ_InvalidAddr) {
@@ -710,6 +878,18 @@ TEST(TestJPC_ADDR, JPC_ValidAddr) {
     ASSERT_EQ("JPC [variable]", compiledCode.at(0).rawCode);
 }
 
+TEST(TestJPC_ADDR, JPC_ignoreCase) {
+    std::stringstream testData;
+    testData << "jpc [variable]" << std::endl;
+    testData << "variable: DB 0x10" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_NE(0, compiledCode.size());
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(0x1A, compiledCode.at(0).instruction);
+    ASSERT_EQ(2, compiledCode.at(0).operand);
+    ASSERT_EQ("jpc [variable]", compiledCode.at(0).rawCode);
+}
+
 TEST(TestJPC_ADDR, JPC_InvalidAddr) {
     std::stringstream testData;
     testData << "JPC [unknown]" << std::endl;
@@ -730,6 +910,10 @@ TEST(TestRST, RST_Valid) {
     GTEST_SKIP() << "Needs implementation";
 }
 
+TEST(TestRST, RST_ignoreCase) {
+    GTEST_SKIP() << "Needs implementation";
+}
+
 TEST(TestRST, RST_Invalid_operand1) {
     GTEST_SKIP() << "Needs implementation";
 }
@@ -743,11 +927,72 @@ TEST(TestDB, DB_Valid) {
 }
 
 TEST(TestComments, Comments_Valid) {
-    GTEST_SKIP() << "Needs implementation";
+    std::stringstream testData;
+    testData << "INIT: ; Initialize state" << std::endl
+             << "   LDA 0xAA ; Load 0xAA into the A register." << std::endl
+             << "   STA [variable] ; Store the value in the A register in memory address variable" << std::endl
+             << "   OUT [variable] ; load the value in the variable memory address to the output register" << std::endl
+             << "   ; OUT 0x23 Commented out" << std::endl
+             << "   LDA 23 ; 45" << std::endl
+             << " ; Empty line" << std::endl
+             << " ;;;; Empty line ;;" << std::endl
+             << "variable: DB 0x00 ; variable pointer" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(5, compiledCode.size());
+
+    ASSERT_EQ(0, compiledCode.at(0).address);
+    ASSERT_EQ(2, compiledCode.at(0).instruction);
+    ASSERT_EQ(0xAA, compiledCode.at(0).operand);
+    ASSERT_EQ("LDA 0xAA ; Load 0xAA into the A register.", compiledCode.at(0).rawCode);
+
+    ASSERT_EQ(2, compiledCode.at(1).address);
+    ASSERT_EQ(4, compiledCode.at(1).instruction);
+    ASSERT_EQ(8, compiledCode.at(1).operand);
+    ASSERT_EQ("STA [variable] ; Store the value in the A register in memory address variable", compiledCode.at(1).rawCode);
+
+    ASSERT_EQ(4, compiledCode.at(2).address);
+    ASSERT_EQ(0x17, compiledCode.at(2).instruction);
+    ASSERT_EQ(8, compiledCode.at(2).operand);
+    ASSERT_EQ("OUT [variable] ; load the value in the variable memory address to the output register", compiledCode.at(2).rawCode);
+
+    ASSERT_EQ(6, compiledCode.at(3).address);
+    ASSERT_EQ(2, compiledCode.at(3).instruction);
+    ASSERT_EQ(23, compiledCode.at(3).operand);
+    ASSERT_EQ("LDA 23 ; 45", compiledCode.at(3).rawCode);
 }
 
-TEST(TestLabels, FunkyLabels) {
-    GTEST_SKIP() << "Needs implementation";
+TEST(TestComments, CommentedOutCode) {
+    std::stringstream testData;
+    testData << "INIT: ; Initialize state" << std::endl
+             << ";   LDA 0xAA ; Load 0xAA into the A register." << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLabels, MissingLabel) {
+    std::stringstream testData;
+    testData << "INIT:" << std::endl
+             << "   LDA [Unknown]" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLabels, MispelledLabel) {
+    std::stringstream testData;
+    testData << "INIT:" << std::endl
+             << "   LDA [Mispell]" << std::endl
+             << "mispell: DB 0" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
+}
+
+TEST(TestLabels, BadFormatLabel) {
+    std::stringstream testData;
+    testData << "INIT:" << std::endl
+             << "   LDA [Mispell]" << std::endl
+             << "mis:pell: DB 0" << std::endl;
+    std::vector<CompiledLine_t> compiledCode = assemble(testData);
+    ASSERT_EQ(0, compiledCode.size());
 }
 
 TEST(TestCombinations, TestCombination1) {

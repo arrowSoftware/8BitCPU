@@ -3,10 +3,11 @@
 #include <iostream>
 #include <iomanip>
 #include <iterator>
+#include <algorithm>
+#include <cctype>
 
 #include "Assembler.h"
-
-// TODO allow upper and lower case instructions
+#include "Helpers.h"
 
 std::vector<CodeLabel_t> labels;
 
@@ -116,6 +117,10 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
     while (it != rawCode.end()) {
         std::stringstream ss(it->line);
         while(std::getline(ss, temp, ' ')) {
+            if (temp.substr(0, 1) == ";") {
+                break;
+            }
+
             if (temp.find(";") == std::string::npos) {
                 it->tokens.push_back(temp);
             }
@@ -124,18 +129,23 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
         for (int i = 0; i < it->tokens.size(); i++) {
             // Gather the labels.
             if (it->tokens.at(i).find(":") != std::string::npos) {
+                std::string::difference_type n = std::count(it->tokens.at(i).begin(), it->tokens.at(i).end(), ':');
+                if (n > 1) {
+                    std::cout << "Error: line " << it->lineNumber << " Syntax error too many ':' in label - " << it->line << std::endl;
+                    return {};
+                }
                 labels.push_back({it->lineNumber, currentAddress, it->tokens.at(i).substr(0, it->tokens.at(i).find(":"))});
             }
 
-            if ((it->tokens.at(i) == "LDA") || (it->tokens.at(i) == "STA") ||
-                (it->tokens.at(i) == "LDB") || (it->tokens.at(i) == "STB") ||
-                (it->tokens.at(i) == "STB") || (it->tokens.at(i) == "ADD") ||
-                (it->tokens.at(i) == "SUB") || (it->tokens.at(i) == "OUT") ||
-                (it->tokens.at(i) == "JMP") || (it->tokens.at(i) == "JPZ") ||
-                (it->tokens.at(i) == "JPC")) {
+            if ((isEqual(it->tokens.at(i), "LDA")) || (isEqual(it->tokens.at(i), "STA")) ||
+                (isEqual(it->tokens.at(i), "LDB")) || (isEqual(it->tokens.at(i), "STB")) ||
+                (isEqual(it->tokens.at(i), "STB")) || (isEqual(it->tokens.at(i), "ADD")) ||
+                (isEqual(it->tokens.at(i), "SUB")) || (isEqual(it->tokens.at(i), "OUT")) ||
+                (isEqual(it->tokens.at(i), "JMP")) || (isEqual(it->tokens.at(i), "JPZ")) ||
+                (isEqual(it->tokens.at(i), "JPC"))) {
 
                 if (it->tokens.size() < i+2) {
-                    std::cout << "Error: Line " << it->lineNumber << " Operand missing - " << it->line << std::endl;
+                    std::cout << "Error: line " << it->lineNumber << " Operand missing - " << it->line << std::endl;
                     return {};
                 } else {
                     std::string operand = it->tokens.at(i+1);
@@ -144,26 +154,28 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
                     } else {
                         int number = parseNumber(operand);
                         if (number == -1) {
-                            std::cout << "Error: Line " << it->lineNumber << " Invalid number format - " << it->line << std::endl;
+                            std::cout << "Error: line " << it->lineNumber << " Invalid number format - " << it->line << std::endl;
                             return {};
                         } else if (number > 255) {
-                            std::cout << "Error: Line " << it->lineNumber << " Number '"<< number << "' exceeds 8 bit max 255 - " << it->line << std::endl;
+                            std::cout << "Error: line " << it->lineNumber << " Number '"<< number << "' exceeds 8 bit max 255 - " << it->line << std::endl;
                             return {};
                         }
                         compiledLine.push_back({currentAddress, getInstructionEnum(it->tokens.at(i), false), operand, parseNumber(operand), it->line, it->lineNumber});
                     }
                     currentAddress += getInstructionSize(getInstructionEnum(it->tokens.at(i), true));
                 }
-            } else if ((it->tokens.at(i) == "HLT") || (it->tokens.at(i) == "OUTA") || (it->tokens.at(i) == "OUTB") || (it->tokens.at(i) == "NOP")) {
+            } else if ((isEqual(it->tokens.at(i), "HLT")) || (isEqual(it->tokens.at(i), "OUTA")) || 
+                       (isEqual(it->tokens.at(i), "OUTB")) || (isEqual(it->tokens.at(i), "NOP"))) {
+
                 if (it->tokens.size() > i+1) {
-                    std::cout << "Error: Line " << it->lineNumber << " Instruction " << it->tokens.at(i) << " does not support operands - " << it->line << std::endl;
+                    std::cout << "Error: line " << it->lineNumber << " Instruction " << it->tokens.at(i) << " does not support operands - " << it->line << std::endl;
                     return {};
                 }
                 compiledLine.push_back({currentAddress, getInstructionEnum(it->tokens.at(i), false), "", 0, it->line, it->lineNumber});
                 currentAddress += getInstructionSize(getInstructionEnum(it->tokens.at(i), false));
-            } else if (it->tokens.at(i) == "DB") {
+            } else if (isEqual(it->tokens.at(i), "DB")) {
                 if (it->tokens.size() < i+2) {
-                    std::cout << "Error: Line " << it->lineNumber << " Missing variable initializer - " << it->line << std::endl;
+                    std::cout << "Error: line " << it->lineNumber << " Missing variable initializer - " << it->line << std::endl;
                     return {};
                 }
 
@@ -180,17 +192,25 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
             if (compiledLine.at(i).rawOperand.find("[") != std::string::npos) {
                 if (compiledLine.at(i).rawOperand.find(labels.at(j).name) != std::string::npos) {
                     compiledLine.at(i).operand = labels.at(j).address;
+                    labels.at(j).referenceCount++;
                     break;
                 }
 
                 // No labels found.
                 if (j == labels.size() - 1) {
-                    std::cout << "Error: Line " << compiledLine.at(i).lineNumber << " undefined reference to '" << compiledLine.at(i).rawOperand << "'" << std::endl;
+                    std::cout << "Error: line " << compiledLine.at(i).lineNumber << " undefined reference to '" << compiledLine.at(i).rawOperand << "'" << std::endl;
                     return {};
                 }
             }
         }
     }
+
+    for (int i = 0; i < labels.size(); i++) {
+        if (labels.at(i).referenceCount == 0) {
+            std::cout << "Warning: 0 references found for label '" << labels.at(i).name << "' on line " << labels.at(i).lineNumber << std::endl;
+        }
+    }
+
     return compiledLine;
 }
 

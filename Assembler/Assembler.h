@@ -26,6 +26,7 @@ typedef struct CodeLabel {
     int lineNumber;
     int address;
     std::string name;
+    int referenceCount;
 } CodeLabel_t;
 
 std::vector<CompiledLine_t> assemble(std::istream &asmfile);

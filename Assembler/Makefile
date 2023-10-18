@@ -10,15 +10,16 @@
 
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
-#GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
+GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
 #GTEST_DIR = C:/Users/tyler/OneDrive/Documents/googletest/googletest
-GTEST_DIR = /usr/src/gtest
+#GTEST_DIR = /usr/src/gtest
 
 # Where to find user code.
 USER_DIR = .
 
 USER_SRCS  = Assembler.cpp \
              Instructions.cpp \
+			 Helpers.cpp \
              AssemblerTest.cpp
 
 USER_HEADS = $(USER_DIR)/*.h
