@@ -1057,7 +1057,7 @@ Fix: Add default initializer to the label variable ```variable: DB 0```.
 ```
 Warning: 0 references found for label 'variable' on line 7
 ```
-Fix: Variable lable is not referenced in code, remove it or reference it.
+Fix: Variable label is not referenced in code, remove it or reference it.
 
 ### Reference assembler outputs.
 Example asm program
