@@ -67,6 +67,14 @@
   - [Program Loader](#program-loader)
   - [8-Bit Processor](#8-bit-processor)
 - [Assembler](#assembler)
+  - [Building](#building)
+  - [Number Formats](#number-formats)
+  - [Label Formats](#label-formats)
+  - [Instruction Formats](#instruction-formats)
+  - [Output files](#output-files)
+  - [Example Output](#example-output)
+  - [Warnings & Errors](#warnings--errors)
+  - [Reference assembler outputs](#reference-assembler-outputs)
 - [Objdump](#objdump)
 - [Emulator](#emulator)
 
@@ -950,6 +958,51 @@ Outputs
 ## Assembler
 [Assembler source](Assembler/)
 
+### Building
+Compile assembler with
+```make```
+
+Compile google test unit tests with
+```make test```
+
+Compile assembler and unit tests with
+```make all```
+
+Execute unit tests and generate coverage report with
+```make coverage```
+
+Clean the build with
+```make clean```
+
+### Number formats
+The assembler support the following number formats:
+- ```100``` Decimal
+- ```100d``` Explicit decimal
+- ```0xAA``` Hexadecimal
+- ```0o20``` Octal
+- ```011b``` Binary
+
+### Label formats
+Labels can be on their own line or inline with code:
+```
+INIT: lda 21
+      outa
+Variable: db 0
+```
+```
+INIT:
+    lda [variable]
+    outa
+variable:
+    db 0
+```
+### Instruction formats
+All instructions/labels are not case sensitive.
+
+### Output files
+```a.hex``` Is a raw hex output for loading into logisim
+```a.bin``` Is a standard binary output format.
+
 ### Example output
 ```
 Assembling example.asm
@@ -976,27 +1029,35 @@ Address   Compiled    Raw
 ```
 Error: line 1 Syntax error too many ':' in label - INI:T:
 ```
+Fix: Fix the label formatting by removing the extra ':' ```INIT:```.
 ```
 Error: Line 2 duplicate label found 'variable' first referenced on line 1
 ```
+Fix: Remove the duplicate label on line 2.
 ```
 Error: line 1 Operand missing - LDA
 ```
+Fix: OpCode requires an operand ```LDA NUM or LDA [addr]```.
 ```
 Error: line 1 Invalid number format - LDA a342
 ```
+Fix: Fix the improper number format by removing the 'a' ```LDA 342```.
 ```
 Error: line 1 Number '300' exceeds 8 bit max 255 - LDA 300
 ```
+Fix: Value exceeds an 8 bit max value, reduce to within range ```LDA 255```.
 ```
 Error: line 1 Instruction HLT does not support operands - HLT 23
 ```
+Fix: Remove the operand from the instruction ```HLT```.
 ```
-Error: line 1 Missing variable initializer - variable DB
+Error: line 1 Missing variable initializer - variable: DB
 ```
+Fix: Add default initializer to the label variable ```variable: DB 0```.
 ```
 Warning: 0 references found for label 'variable' on line 7
 ```
+Fix: Variable lable is not referenced in code, remove it or reference it.
 
 ### Reference assembler outputs.
 Example asm program
