@@ -14,22 +14,22 @@ GTEST_DIR = C:/Users/Tyler/Documents/googletest/googletest
 
 USER_DIR = .
 
-USER_SRCS  = Assembler.cpp \
-			 Instructions.cpp \
-			 Helpers.cpp \
+USER_SRCS  = ObjDump.cpp \
+			../Instructions.cpp \
+			../Helpers.cpp \
 			 main.cpp
 
-USER_HEADS = $(USER_DIR)/*.h
+USER_HEADS = $(USER_DIR)/*.h ../*.h
 USER_OBJS = $(USER_SRCS:.cpp=.o)
 
-USER_TEST_SRCS  = Assembler.cpp \
-			 Instructions.cpp \
-			 Helpers.cpp \
-			 AssemblerTest.cpp
+USER_TEST_SRCS  = ObjDump.cpp \
+			../Instructions.cpp \
+			../Helpers.cpp \
+			 ObjDumpTest.cpp
 
 USER_TEST_OBJS = $(USER_TEST_SRCS:.cpp=.o)
 
-INCLUDES = -I.
+INCLUDES = -I. -I../
 
 # Flags passed to the preprocessor.
 CPPFLAGS += --coverage -g -O0 -isystem $(GTEST_DIR)/include
@@ -37,8 +37,8 @@ CPPFLAGS += --coverage -g -O0 -isystem $(GTEST_DIR)/include
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -pthread
 
-TARGET = assembler
-TEST_TARGET = assemblerTest
+TARGET = objdump
+TEST_TARGET = objdumpTest
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 				$(GTEST_DIR)/include/gtest/internal/*.h
@@ -79,4 +79,4 @@ $(TARGET): $(USER_OBJS)
 	$(CXX) -o $@ $(USER_OBJS) $(CPPFLAGS) $(CXXFLAGS)
 
 $(USER_DIR)/%.o: $(USER_DIR)/%.cpp $(USER_HEADS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) -c -o $@ $< $(CPPFLAGS)
+	$(CXX) $(CPPFLAGS) -I../ -c -o $@ $< $(CPPFLAGS)

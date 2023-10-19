@@ -62,3 +62,37 @@ Instructions_t getInstructionEnum(std::string instruction, bool addr) {
     }
     return NOP;
 }
+
+std::string getInstructionStr(Instructions_t instruction) {
+    switch (instruction) {
+        case (NOP):      { return "NOP"; break; }
+        case (HLT):      { return "HLT"; break; }
+        case (LDA_NUM):  { return "LDA"; break; }
+        case (LDA_ADDR): { return "LDA"; break; }
+        case (STA_ADDR): { return "STA"; break; }
+        case (LDB_NUM):  { return "LDB"; break; }
+        case (LDB_ADDR): { return "LDB"; break; }
+        case (STB_ADDR): { return "STB"; break; }
+        case (ADD_NUM):  { return "ADD"; break; }
+        case (ADD_ADDR): { return "ADD"; break; }
+        case (SUB_NUM):  { return "SUB"; break; }
+        case (SUB_ADDR): { return "SUB"; break; }
+        case (AND_NUM):  { return "AND"; break; }
+        case (AND_ADDR): { return "AND"; break; }
+        case (OR_NUM):   { return "OR"; break; }
+        case (OR_ADDR):  { return "OR"; break; }
+        case (XOR_NUM):  { return "XOR"; break; }
+        case (XOR_ADDR): { return "XOR"; break; }
+        case (NOTA):     { return "NOTA"; break; }
+        case (NOT_ADDR): { return "NOT"; break; }
+        case (OUTA):     { return "OUTA"; break; }
+        case (OUTB):     { return "OUTB"; break; }
+        case (OUT_NUM):  { return "OUT"; break; }
+        case (OUT_ADDR): { return "OUT"; break; }
+        case (JMP_ADDR): { return "JMP"; break; }
+        case (JPZ_ADDR): { return "JPZ"; break; }
+        case (JPC_ADDR): { return "JPC"; break; }
+        case (RST):      { return "RST"; break; }
+        default: { return "UNKNOWN"; break; }
+    }
+}

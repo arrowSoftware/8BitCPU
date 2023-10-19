@@ -38,6 +38,7 @@ typedef enum Instructions {
 } Instructions_t;
 
 extern Instructions_t getInstructionEnum(std::string instruction, bool addr);
+extern std::string getInstructionStr(Instructions_t instruction);
 
 typedef struct InstructionDetails {
     Instructions_t name;
