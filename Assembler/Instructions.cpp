@@ -96,3 +96,37 @@ std::string getInstructionStr(Instructions_t instruction) {
         default: { return "UNKNOWN"; break; }
     }
 }
+
+bool isAddressInstruction(Instructions_t instruction) {
+    switch (instruction) {
+        case LDA_ADDR:
+        case STA_ADDR:
+        case LDB_ADDR:
+        case STB_ADDR:
+        case ADD_ADDR:
+        case SUB_ADDR:
+        case AND_ADDR:
+        case XOR_ADDR:
+        case OR_ADDR:
+        case NOT_ADDR:
+        case OUT_ADDR:
+        case JMP_ADDR:
+        case JPZ_ADDR:
+        case JPC_ADDR: { return true; }
+        case NOP:
+        case HLT:
+        case LDA_NUM:
+        case LDB_NUM:
+        case ADD_NUM:
+        case SUB_NUM:
+        case AND_NUM:
+        case OR_NUM:
+        case XOR_NUM:
+        case NOTA:
+        case OUTA:
+        case OUTB:
+        case OUT_NUM:
+        case RST:
+        default: { return false; }
+    }
+}
