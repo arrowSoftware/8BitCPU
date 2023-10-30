@@ -2,6 +2,7 @@
 #include "CounterRegister.hpp"
 #include "ProgramLoader.hpp"
 #include "RAM.hpp"
+#include "ALU.hpp"
 
 #include <stdio.h>
 #include <gtest/gtest.h>
@@ -176,7 +177,7 @@ TEST(RAMTest, readWrite) {
 
     // Load the bus with an address
     dataBus.load(10);
-    
+
     // store the address in the register
     memoryRegister.clock(true);
     memoryRegister.load();
@@ -259,7 +260,22 @@ TEST(LoadProgramToRAMFromROM, FullLoad) {
     }
 }
 
+TEST(ALUTest, FullLoad) {
+    DataBus<uint8_t> dataBus;
+    Register<uint8_t> aRegister(&dataBus);
+    Register<uint8_t> bRegister(&dataBus);
+    ALU<uint8_t> alu(&dataBus, &aRegister, &bRegister);
+    dataBus.load(0x05);
+    aRegister.clock(true);
+    aRegister.load();
+    dataBus.load(0x04);
+    bRegister.clock(true);
+    bRegister.load();
+    alu.enable();
+    ASSERT_EQ(9, alu.peak());
+}
+
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-}      
+}

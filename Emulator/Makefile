@@ -18,9 +18,9 @@ GTEST_DIR = /usr/src/gtest
 USER_DIR = .
 
 USER_SRCS  = EmulatorTest.cpp \
-			 ALU.cpp  \
+			 ALU.hpp  \
 			 CounterRegister.hpp \
-			 InstructionDecoder.cpp \
+			 InstructionDecoder.hpp \
 			 ProgramLoader.hpp \
 			 ROM.hpp \
 			 RAM.hpp \
@@ -53,7 +53,7 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 all : $(TARGET)
 
 clean :
-	del gtest.a gtest_main.a *.o $(TARGET)
+	rm -rf gtest.a gtest_main.a *.o $(TARGET)
 
 # Builds gtest.a and gtest_main.a.
 
