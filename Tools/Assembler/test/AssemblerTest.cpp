@@ -1279,12 +1279,11 @@ TEST(TestOutput, outputHex) {
         "01 00",
         "00"
     };
-    int i = 0;
     ASSERT_TRUE(inputFile.is_open());
     int lineCount = std::count(std::istreambuf_iterator<char>(inputFile), std::istreambuf_iterator<char>(), '\n');
     inputFile.seekg(0, std::ios_base::beg);
     ASSERT_EQ(expectedLines.size(), lineCount);
-    for (int i = 0; i < expectedLines.size(); i++) {
+    for (size_t i = 0; i < expectedLines.size(); i++) {
         std::getline(inputFile, line);
         ASSERT_EQ(expectedLines.at(i), line);
     }
@@ -1334,7 +1333,7 @@ TEST(TestOutput, outputBin) {
     };
 
     ASSERT_EQ(expectedData.size(), contents.size());
-    for (int i = 0; i < expectedData.size(); i++) {
+    for (size_t i = 0; i < expectedData.size(); i++) {
         ASSERT_EQ(expectedData.at(i), contents.at(i));
     }
 }

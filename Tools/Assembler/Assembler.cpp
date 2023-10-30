@@ -16,7 +16,7 @@ void outputCompiledCode(std::vector<CompiledLine_t> compiledCode) {
     hexFile << "v2.0 raw" << std::endl;
 
     std::cout << "Address   Compiled    Raw" << std::endl;
-    for (int i = 0; i < compiledCode.size(); i++) {
+    for (size_t i = 0; i < compiledCode.size(); i++) {
         std::cout << std::right << std::setw(3) << std::setfill(' ') << std::uppercase << std::hex << compiledCode.at(i).address << ":" << std::setw(6) << " ";
 
         if (compiledCode.at(i).instruction != DB) {
@@ -74,7 +74,7 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
             }
         }
 
-        for (int i = 0; i < it->tokens.size(); i++) {
+        for (size_t i = 0; i < it->tokens.size(); i++) {
             // Gather the labels.
             if (it->tokens.at(i).find(":") != std::string::npos) {
                 std::string::difference_type n = std::count(it->tokens.at(i).begin(), it->tokens.at(i).end(), ':');
@@ -88,7 +88,7 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
                     std::cerr << "Error: Line " << it->lineNumber << " duplicate label found '" << labels.at(i).name << "' first referenced on line " << dupeIt->lineNumber << std::endl;
                     return {};
                 }
-                labels.push_back({it->lineNumber, currentAddress, strippedLabel});
+                labels.push_back({it->lineNumber, currentAddress, strippedLabel, 0});
             }
 
             if ((isEqual(it->tokens.at(i), "LDA")) || (isEqual(it->tokens.at(i), "STA")) ||
@@ -98,7 +98,7 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
                 (isEqual(it->tokens.at(i), "JMP")) || (isEqual(it->tokens.at(i), "JPZ")) ||
                 (isEqual(it->tokens.at(i), "JPC"))) {
 
-                if (it->tokens.size() < i+2) {
+                if (it->tokens.size() < size_t(i+2)) {
                     std::cerr << "Error: line " << it->lineNumber << " Operand missing - " << it->line << std::endl;
                     return {};
                 } else {
@@ -121,14 +121,14 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
             } else if ((isEqual(it->tokens.at(i), "HLT")) || (isEqual(it->tokens.at(i), "OUTA")) ||
                        (isEqual(it->tokens.at(i), "OUTB")) || (isEqual(it->tokens.at(i), "NOP"))) {
 
-                if (it->tokens.size() > i+1) {
+                if (it->tokens.size() > size_t(i+1)) {
                     std::cerr << "Error: line " << it->lineNumber << " Instruction " << it->tokens.at(i) << " does not support operands - " << it->line << std::endl;
                     return {};
                 }
                 compiledLine.push_back({currentAddress, getInstructionEnum(it->tokens.at(i), false), "", 0, it->line, it->lineNumber});
                 currentAddress += getInstructionSize(getInstructionEnum(it->tokens.at(i), false));
             } else if (isEqual(it->tokens.at(i), "DB")) {
-                if (it->tokens.size() < i+2) {
+                if (it->tokens.size() < size_t(i+2)) {
                     std::cerr << "Error: line " << it->lineNumber << " Missing variable initializer - " << it->line << std::endl;
                     return {};
                 }
@@ -141,8 +141,8 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
         ++it;
     }
 
-    for (int i = 0; i < compiledLine.size(); i++) {
-        for (int j = 0; j < labels.size(); j++) {
+    for (size_t i = 0; i < compiledLine.size(); i++) {
+        for (size_t j = 0; j < labels.size(); j++) {
             if (compiledLine.at(i).rawOperand.find("[") != std::string::npos) {
                 if (compiledLine.at(i).rawOperand.find(labels.at(j).name) != std::string::npos) {
                     compiledLine.at(i).operand = labels.at(j).address;
@@ -159,7 +159,7 @@ std::vector<CompiledLine_t> assemble(std::istream &asmfile) {
         }
     }
 
-    for (int i = 0; i < labels.size(); i++) {
+    for (size_t i = 0; i < labels.size(); i++) {
         if (labels.at(i).referenceCount == 0) {
             std::cerr << "Warning: 0 references found for label '" << labels.at(i).name << "' on line " << labels.at(i).lineNumber << std::endl;
         }

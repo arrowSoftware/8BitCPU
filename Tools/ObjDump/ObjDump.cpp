@@ -39,39 +39,38 @@ void objdump(std::istream &binfile) {
     contents.reserve(fileSize);
     contents.insert(contents.begin(), std::istream_iterator<uint8_t>(binfile), std::istream_iterator<uint8_t>());
 
-    for (int i = 0; i < contents.size(); i++) {
+    for (size_t i = 0; i < contents.size(); i++) {
         Instructions_t instruction = (Instructions_t)(contents.at(i)&0xFF);
         int instructionSize = getInstructionSize(instruction);
         if (instructionSize == 2) {
             int operand = (contents.at(i+1) & 0xFF);
-            dissembledCode.push_back({i, instruction, getInstructionStr(instruction), true, operand, ""});
+            dissembledCode.push_back({(int)i, instruction, getInstructionStr(instruction), true, operand, ""});
             i++;
         } else if (instruction == 1) {
-            dissembledCode.push_back({i, instruction, getInstructionStr(instruction), false, 0, ""});
+            dissembledCode.push_back({(int)i, instruction, getInstructionStr(instruction), false, 0, ""});
         } else {
             std::stringstream label;
             label << "var" << ++labelCount;
-            labels.push_back({i, label.str()});
+            labels.push_back({(int)i, label.str()});
             label << ": DB";
-            dissembledCode.push_back({i, DB, label.str(), true, (contents.at(i)&0xFF), ""});
+            dissembledCode.push_back({(int)i, DB, label.str(), true, (contents.at(i)&0xFF), ""});
         }
     }
 
-    for (int i = 0; i < dissembledCode.size(); i++) {
+    for (size_t i = 0; i < dissembledCode.size(); i++) {
         if (dissembledCode.at(i).hasOperand) {
             if (isAddressInstruction(dissembledCode.at(i).instruction)) {
-                std::vector<Label_t>::iterator it = std::find_if(labels.begin(), labels.end(), [&cm = dissembledCode.at(i).operand](const Label_t& m) -> bool { return cm == m.address; }); 
+                std::vector<Label_t>::iterator it = std::find_if(labels.begin(), labels.end(), [&cm = dissembledCode.at(i).operand](const Label_t& m) -> bool { return cm == m.address; });
                 if (it != labels.end()) {
                     dissembledCode.at(i).addressOperand = it->name;
                 } else {
-                    for (int carl = 0; carl < dissembledCode.size(); carl++) {
-                        if (dissembledCode.at(i).operand == dissembledCode.at(carl).address) {
+                    for (size_t j = 0; j < dissembledCode.size(); j++) {
+                        if (dissembledCode.at(i).operand == dissembledCode.at(j).address) {
                             std::stringstream label2;
                             label2 << "label" << ++otherLabelCount;
-//                            labels.push_back({i, label.str()});
                             dissembledCode.at(i).addressOperand = label2.str();
                             CodeLine_t temp = {0, LABEL, label2.str(), false, 0, ""};
-                            dissembledCode.insert(dissembledCode.begin()+carl, temp);
+                            dissembledCode.insert(dissembledCode.begin()+j, temp);
                             i++;
                             break;
                         }
@@ -79,20 +78,17 @@ void objdump(std::istream &binfile) {
                 }
             }
         }
-//        std::cout << std::hex << std::uppercase << dissembledCode.at(i).address << ": " 
-//                  << dissembledCode.at(i).instructionStr << " " 
-//                  << std::hex << std::uppercase << dissembledCode.at(i).operand << std::endl;
     }
 
 
-    for (int i = 0; i < dissembledCode.size(); i++) {
+    for (size_t i = 0; i < dissembledCode.size(); i++) {
         if (dissembledCode.at(i).instruction == LABEL) {
             printf("%s:\n", dissembledCode.at(i).addressOperand.c_str());
         }
 
         if (dissembledCode.at(i).hasOperand) {
             if (isAddressInstruction(dissembledCode.at(i).instruction)) {
-                std::vector<Label_t>::iterator it = std::find_if(labels.begin(), labels.end(), [&cm = dissembledCode.at(i).operand](const Label_t& m) -> bool { return cm == m.address; }); 
+                std::vector<Label_t>::iterator it = std::find_if(labels.begin(), labels.end(), [&cm = dissembledCode.at(i).operand](const Label_t& m) -> bool { return cm == m.address; });
                 if (it != labels.end()) {
                     printf("%02X: %s [%s]\n", dissembledCode.at(i).address, dissembledCode.at(i).instructionStr.c_str(), it->name.c_str());
                 } else {
@@ -106,22 +102,3 @@ void objdump(std::istream &binfile) {
         }
     }
 }
-
-
-/*
-00: LDA 00
-02: STA [var1]
-04: OUT [var1]
-06: LDA 01
-08: STA [var2]
-0A: OUT [var2]
-0C: LDA [var1]
-0E: ADD [var2]
-10: STB [var1]
-12: STA [var2]
-14: JPC [todo]
-16: JMP [todo]
-18: HLT
-19: var1: DB 00
-1A: var2: DB 00
-*/

@@ -4,6 +4,11 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
+    if (argc < 2) {
+        std::cerr << "Usage: objdump [inputfile]" << std::endl;
+        return -1;
+    }
+
     std::ifstream inputFile(argv[1], std::ios::in | std::ios::binary);
 
     if (!inputFile.is_open()) {
