@@ -1,5 +1,5 @@
 INIT:
-    LDA 00
+    LDA 0x0
     STA [N1]
     OUT [N1]
     LDA 01

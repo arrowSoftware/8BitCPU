@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -81,24 +82,36 @@ void objdump(std::istream &binfile) {
     }
 
 
+    std::ofstream asmFile("a.asm");
+
     for (size_t i = 0; i < dissembledCode.size(); i++) {
         if (dissembledCode.at(i).instruction == LABEL) {
-            printf("%s:\n", dissembledCode.at(i).addressOperand.c_str());
+            std::cout << dissembledCode.at(i).instructionStr << ":" << std::endl;
+            asmFile << dissembledCode.at(i).instructionStr << ":" << std::endl;
+            continue;
         }
 
         if (dissembledCode.at(i).hasOperand) {
             if (isAddressInstruction(dissembledCode.at(i).instruction)) {
                 std::vector<Label_t>::iterator it = std::find_if(labels.begin(), labels.end(), [&cm = dissembledCode.at(i).operand](const Label_t& m) -> bool { return cm == m.address; });
                 if (it != labels.end()) {
-                    printf("%02X: %s [%s]\n", dissembledCode.at(i).address, dissembledCode.at(i).instructionStr.c_str(), it->name.c_str());
+                    std::cout << "    " << dissembledCode.at(i).instructionStr << " [" << it->name << "]" << std::endl;
+                    asmFile << "    " << dissembledCode.at(i).instructionStr << " [" << it->name << "]" << std::endl;
                 } else {
-                    printf("%02X: %s [%s]\n", dissembledCode.at(i).address, dissembledCode.at(i).instructionStr.c_str(), dissembledCode.at(i).addressOperand.c_str());
+                    std::cout << "    " << dissembledCode.at(i).instructionStr << " [" << dissembledCode.at(i).addressOperand << "]" << std::endl;
+                    asmFile << "    " << dissembledCode.at(i).instructionStr << " [" << dissembledCode.at(i).addressOperand << "]" << std::endl;
                 }
             } else {
-                printf("%02X: %s %02X\n", dissembledCode.at(i).address, dissembledCode.at(i).instructionStr.c_str(), dissembledCode.at(i).operand);
+                if (dissembledCode.at(i).instruction != DB) {
+                    std::cout << "    ";
+                    asmFile << "    ";
+                }
+                std::cout << dissembledCode.at(i).instructionStr << " " << std::setw(2) << std::setfill('0') << "0x" << dissembledCode.at(i).operand << std::endl;
+                asmFile << dissembledCode.at(i).instructionStr << " " << std::setw(2) << std::setfill('0') << "0x" << dissembledCode.at(i).operand << std::endl;
             }
         } else {
-            printf("%02X: %s\n", dissembledCode.at(i).address, dissembledCode.at(i).instructionStr.c_str());
+            std::cout << "    " << dissembledCode.at(i).instructionStr << std::endl;
+            asmFile << "    " << dissembledCode.at(i).instructionStr << std::endl;
         }
     }
 }
