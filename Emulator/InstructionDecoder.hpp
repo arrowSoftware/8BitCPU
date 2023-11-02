@@ -1,6 +1,12 @@
 #ifndef __InstructionDecoder_H__
 #define __InstructionDecoder_H__
 
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 #include "DataBus.hpp"
 #include "Register.hpp"
 #include "ALU.hpp"
@@ -22,7 +28,7 @@ class InstructionDecoder
             CounterRegister<T> *instructionRegister,
             ALU<T> *alu,
             RAM<T> *ram,
-            ROM<T> *rom,
+            ROM<T> *rom
         ) :
         _dataBus(dataBus),
         _aRegister(aRegister),
@@ -34,12 +40,30 @@ class InstructionDecoder
         _instructionRegister(instructionRegister),
         _alu(alu),
         _ram(ram),
-        _rom(rom),
-        _clock(false) {
-        }
+        _rom(rom) {}
+
         ~InstructionDecoder(void) {}
 
-        bool clock(bool high) {
+        void loadInstructionMap(void) {
+            std::ifstream infile("../istructionDecoderMicrowords.rom");
+            std::string value;
+            std::string line;
+
+            while (std::getline(infile, line)) {
+                // Skip first line.
+                if (line.find("raw") != std::string::npos) {
+                    continue;
+                }
+
+                std::istringstream iss(line);
+
+                while (iss >> value) {
+                    _instructionMicrocodeMap.push_back(stoi(value, 0, 16));
+                }
+            }
+        }
+
+        void clock(bool high) {
             _clock = high;
             _outRegister->clock(high);
             _pcRegister->clock(high);
@@ -54,69 +78,70 @@ class InstructionDecoder
 
         }
 
-        bool OI(void) {
+        void OI(void) {
             _outRegister->load();
         }
-        bool JP(void) {
+        void JP(void) {
             _pcRegister->load();
         }
-        bool CO(void) {
+        void CO(void) {
             _pcRegister->output();
         }
-        bool CE(void) {
+        void CE(void) {
             _pcRegister->enable();
         }
-        bool IR(void) {
-            _instructionRegister->reset();
+        void IR(void) {
+            
         }
-        bool II(void) {
+        void II(void) {
             _instructionRegister->load();
         }
-        bool RR(void) {
+        void RR(void) {
             _ram->read();
         }
-        bool RW(void) {
+        void RW(void) {
             _ram->write();
         }
-        bool MI(void) {
+        void MI(void) {
             _memRegister->load();
         }
-        bool BO(void) {
+        void BO(void) {
             _bRegister->output();
         }
-        bool BI(void) {
+        void BI(void) {
             _bRegister->load();
         }
-        bool CI(void) {
+        void CI(void) {
             _pcRegister->load();
         }
-        bool EO(void) {
+        void EO(void) {
             _alu->output();
         }
-        bool SEL1(int en) {
+        void SEL1(int en) {
             _alu->SEL1(en);
         }
-        bool SEL2(int en) {
+        void SEL2(int en) {
             _alu->SEL2(en);
         }
-        bool SEL3(int en) {
-            alu->SEL3(en);
+        void SEL3(int en) {
+            _alu->SEL3(en);
         }
-        bool AO(void) {
+        void AO(void) {
             _aRegister->output();
         }
-        bool AI(void) {
+        void AI(void) {
             _aRegister->load();
         }
-        bool HLT(void) {
+        void HLT(void) {
             // TODO
         }
-        bool FI(void) {
+        void FI(void) {
             _flagsRegister->load();
         }
 
     protected:
     private:
+        DataBus<T> *_dataBus;
         Register<T> *_aRegister;
         Register<T> *_bRegister;
         Register<T> *_memRegister;
@@ -128,12 +153,8 @@ class InstructionDecoder
         RAM<T> *_ram;
         ROM<T> *_rom;
 
-        // 8 columns of 6 bytes each
-        static const int INSTRUCTION_SET_MAP_COLUMNS = 8;
-        static const int CONTROL_FLAG_SIZE_BYES = 6;
-        static const int INSTRUCTION_SET_SIZE = INSTRUCTION_SET_MAP_COLUMNS*CONTROL_FLAG_SIZE_BYES;
-        //controlFlags controlFlagROM[512];
-        DataBus<T> *_dataBus;
+        std::vector<uint32_t> _instructionMicrocodeMap;
+
         bool _clock;
         // inputs
         bool _VF;
@@ -145,28 +166,6 @@ class InstructionDecoder
         bool _OP3;
         bool _OP4;
         bool _PM;
-        // outputs
-        bool _OI;
-        bool _JP;
-        bool _CO;
-        bool _CE;
-        bool _IR;
-        bool _II;
-        bool _RR;
-        bool _RW;
-        bool _MI;
-        bool _BO;
-        bool _BI;
-        bool _CI;
-        bool _EO;
-        bool _SEL1;
-        bool _SEL2;
-        bool _SEL3;
-        bool _AO;
-        bool _AI;
-        bool _HLT;
-        bool _FI;
-
 };
 
 #endif // __InstructionDecoder_H__

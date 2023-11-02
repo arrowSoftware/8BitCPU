@@ -3,6 +3,7 @@
 
 #include "DataBus.hpp"
 #include "Register.hpp"
+#include <cstring>
 
 template <class T>
 class RAM
