@@ -14,5 +14,15 @@ int main(int argc, char **argv) {
     RAM<uint8_t> ram(&dataBus, &memRegister);
     InstructionDecoder<uint8_t> decoder(&dataBus, &aRegister, &bRegister, &memRegister, &pcRegister, &outRegister, &flagsRegister, &instructionRegister, &alu, &ram, &rom);
     decoder.loadInstructionMap();
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
+    decoder.clock(false);
     return 0;
 }

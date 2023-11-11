@@ -65,16 +65,30 @@ class InstructionDecoder
 
         void clock(bool high) {
             _clock = high;
-            _outRegister->clock(high);
-            _pcRegister->clock(high);
-            _instructionRegister->clock(high);
-            _memRegister->clock(high);
-            _aRegister->clock(high);
-            _bRegister->clock(high);
-            _flagsRegister->clock(high);
+
+            // on the low pulse the address is incremented.
+            if (high == false) {
+                int zf = 1, cf = 0,  cp0 = 0,  cp1 = 0,  cp2 = 0,  cp3 = 0,  cp4 = 0;
+
+                uint16_t addressSelect = _addressCounter;
+                addressSelect |= zf << 3;
+                addressSelect |= cf << 4;
+                addressSelect |= cp0 << 5;
+                addressSelect |= cp1 << 6;
+                addressSelect |= cp2 << 7;
+                addressSelect |= cp3 << 8;
+                addressSelect |= cp4 << 9;
+                printf("0x%x\n",addressSelect);
+                _addressCounter++;
+            }
+
+            if (_addressCounter >= 8) {
+                _addressCounter = 0;
+            }
         }
 
         void reset(void) {
+            _addressCounter = 0;
 
         }
 
@@ -91,7 +105,7 @@ class InstructionDecoder
             _pcRegister->enable();
         }
         void IR(void) {
-            
+            _addressCounter = 0;
         }
         void II(void) {
             _instructionRegister->load();
@@ -154,6 +168,8 @@ class InstructionDecoder
         ROM<T> *_rom;
 
         std::vector<uint32_t> _instructionMicrocodeMap;
+
+        int _addressCounter = 0;
 
         bool _clock;
         // inputs
