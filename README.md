@@ -86,6 +86,12 @@
 * https://www.daniellowengrub.com/blog/2021/02/08/binary-counter
 * https://github.com/hlorenzi/customasm
 * https://cs.lmu.edu/~ray/notes/nasmtutorial/
+### Backplane references
+* https://github.com/daveho/easycpu
+* https://hackaday.io/project/190621-zara80/log/218492-5-slot-stebus-backplane-rev-1
+* https://tclarke.github.io/zara80/stebus-backplane.svg
+* https://blondihacks.com/wp-content/uploads/2011/12/Backplane_Sch.jpg
+* https://smallcomputercentral.files.wordpress.com/2018/09/modular-backplane-specification-v0-4-2018-09-19.pdf
 
 ## TODO
 
