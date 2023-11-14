@@ -1,0 +1,7 @@
+
+*.o
+*.a
+*.exe
+*.zip
+KiCad/DoubleRow6SlotBackplane/fp-info-cache
+KiCad/PrototypeSlotBoard/fp-info-cache
